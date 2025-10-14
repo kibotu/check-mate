@@ -159,9 +159,6 @@ Result: Only 3 lines differ (the `<script src="bridge.js">` tag on Android)
 ## 📚 Documentation
 
 - **[spec.md](spec.md)** - Complete bridge specification
-- **[FEATURE_PARITY.md](FEATURE_PARITY.md)** - Feature comparison between platforms
-- **[WEB_CODE_IDENTITY.md](WEB_CODE_IDENTITY.md)** - Proof of code identity
-- **[UNIFIED_CODEBASE.md](UNIFIED_CODEBASE.md)** - Architecture and benefits
 - **[android-sample/README.md](android-sample/README.md)** - Android implementation details
 - **[ios-sample/README.md](ios-sample/README.md)** - iOS implementation details
 
