@@ -98,6 +98,20 @@ class BridgeViewController: UIViewController, ObservableObject {
         print("[Bridge] Loading local HTML: \(htmlURL.path)")
     }
     
+    private func scheduleDemoEvent() {
+        // Send a demo event after 5 seconds (like Android does)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+            self?.sendEventToWeb(
+                action: "nativeEvent",
+                content: [
+                    "type": "demo",
+                    "message": "Hello from iOS!",
+                    "timestamp": Date().timeIntervalSince1970
+                ]
+            )
+        }
+    }
+    
     // MARK: - Public Methods
     
     func reload() {
@@ -354,6 +368,9 @@ extension BridgeViewController: WKNavigationDelegate {
         DispatchQueue.main.async {
             self.isReady = true
         }
+        
+        // Schedule demo event (like Android does)
+        scheduleDemoEvent()
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

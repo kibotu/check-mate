@@ -197,6 +197,14 @@
         </div>
         
         <div class="card">
+            <h2>🌐 Network & Settings</h2>
+            <div class="grid">
+                <button onclick="getNetworkStatus()">Network Status</button>
+                <button onclick="openSettings()">Open Settings</button>
+            </div>
+        </div>
+        
+        <div class="card">
             <h2>⚙️ Advanced Features</h2>
             <button onclick="testTimeout()">Test Timeout (5s)</button>
             <button onclick="testErrorHandling()">Test Error Handling</button>
@@ -393,6 +401,32 @@
                 logEvent(`Permission ${result.granted ? 'granted' : 'denied'}`);
             } catch (error) {
                 showOutput('permissionOutput', `Error: ${error.message}`, true);
+            }
+        }
+        
+        // Network & Settings
+        async function getNetworkStatus() {
+            try {
+                logEvent('Getting network status...');
+                const result = await window.bridge.call({
+                    data: { action: 'getNetworkStatus' }
+                });
+                showOutput('advancedOutput', result);
+                logEvent(`Network: ${result.online ? 'Online' : 'Offline'} (${result.type})`);
+            } catch (error) {
+                showOutput('advancedOutput', `Error: ${error.message}`, true);
+            }
+        }
+        
+        async function openSettings() {
+            try {
+                logEvent('Opening app settings...');
+                await window.bridge.call({
+                    data: { action: 'openSettings' }
+                });
+                logEvent('Settings opened');
+            } catch (error) {
+                showOutput('advancedOutput', `Error: ${error.message}`, true);
             }
         }
         

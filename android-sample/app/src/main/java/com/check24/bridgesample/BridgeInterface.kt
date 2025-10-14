@@ -1,12 +1,21 @@
 package com.check24.bridgesample
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -169,6 +178,27 @@ class BridgeInterface(private val webView: WebView) {
                     // No response needed for fire-and-forget
                 }
                 
+                "trackScreen" -> {
+                    // Fire-and-forget analytics screen tracking
+                    val contentObj = content as? JsonObject
+                    val screenName = contentObj?.get("screen")?.toString()?.removeSurrounding("\"") ?: "unknown"
+                    val properties = contentObj?.get("properties")
+                    Log.i(TAG, "Track screen: $screenName, properties: $properties")
+                    
+                    // In a real app, send to analytics service here
+                    // No response needed for fire-and-forget
+                }
+                
+                "setUserId" -> {
+                    // Fire-and-forget user ID setting
+                    val contentObj = content as? JsonObject
+                    val userId = contentObj?.get("userId")?.toString()?.removeSurrounding("\"") ?: ""
+                    Log.i(TAG, "Set user ID: $userId")
+                    
+                    // In a real app, set in analytics service here
+                    // No response needed for fire-and-forget
+                }
+                
                 "requestPermission" -> {
                     val contentObj = content as? JsonObject
                     val permission = contentObj?.get("permission")?.toString()?.removeSurrounding("\"") ?: "unknown"
@@ -224,6 +254,169 @@ class BridgeInterface(private val webView: WebView) {
                         sendResult(id, buildJsonObject {
                             put("success", true)
                         })
+                    }
+                }
+                
+                "removeSecureData" -> {
+                    val contentObj = content as? JsonObject
+                    val key = contentObj?.get("key")?.toString()?.removeSurrounding("\"") ?: ""
+                    Log.i(TAG, "Remove secure data: $key")
+                    
+                    // In a real app, remove from secure storage
+                    if (id != null) {
+                        sendResult(id, buildJsonObject {
+                            put("success", true)
+                        })
+                    }
+                }
+                
+                "openSettings" -> {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", webView.context.packageName, null)
+                    intent.data = uri
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    webView.context.startActivity(intent)
+                    
+                    if (id != null) {
+                        sendResult(id, buildJsonObject {
+                            put("success", true)
+                        })
+                    }
+                }
+                
+                "copyToClipboard" -> {
+                    val contentObj = content as? JsonObject
+                    val text = contentObj?.get("text")?.toString()?.removeSurrounding("\"") ?: ""
+                    val clipboard = webView.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("web_bridge", text)
+                    clipboard.setPrimaryClip(clip)
+                    
+                    if (id != null) {
+                        sendResult(id, buildJsonObject {
+                            put("success", true)
+                        })
+                    }
+                }
+                
+                "openUrl" -> {
+                    val contentObj = content as? JsonObject
+                    val url = contentObj?.get("url")?.toString()?.removeSurrounding("\"") ?: ""
+                    val external = contentObj?.get("external")?.toString()?.toBoolean() ?: false
+                    
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        if (external) {
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        webView.context.startActivity(intent)
+                        
+                        if (id != null) {
+                            sendResult(id, buildJsonObject {
+                                put("success", true)
+                            })
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error opening URL: $url", e)
+                        if (id != null) {
+                            sendError(id, "URL_ERROR", "Failed to open URL: ${e.message}")
+                        }
+                    }
+                }
+                
+                "showAlert" -> {
+                    val contentObj = content as? JsonObject
+                    val title = contentObj?.get("title")?.toString()?.removeSurrounding("\"") ?: "Alert"
+                    val message = contentObj?.get("message")?.toString()?.removeSurrounding("\"") ?: ""
+                    
+                    // Show AlertDialog
+                    mainHandler.post {
+                        val context = webView.context
+                        if (context is android.app.Activity) {
+                            AlertDialog.Builder(context)
+                                .setTitle(title)
+                                .setMessage(message)
+                                .setPositiveButton("OK") { dialog, _ ->
+                                    dialog.dismiss()
+                                    if (id != null) {
+                                        sendResult(id, buildJsonObject {
+                                            put("button", "OK")
+                                            put("index", 0)
+                                        })
+                                    }
+                                }
+                                .setNegativeButton("Cancel") { dialog, _ ->
+                                    dialog.dismiss()
+                                    if (id != null) {
+                                        sendResult(id, buildJsonObject {
+                                            put("button", "Cancel")
+                                            put("index", 1)
+                                        })
+                                    }
+                                }
+                                .show()
+                        } else {
+                            if (id != null) {
+                                sendError(id, "CONTEXT_ERROR", "Cannot show alert: context is not an Activity")
+                            }
+                        }
+                    }
+                    return // Early return as we handle response in button callbacks
+                }
+                
+                "setTitle" -> {
+                    val contentObj = content as? JsonObject
+                    val title = contentObj?.get("title")?.toString()?.removeSurrounding("\"") ?: ""
+                    
+                    val context = webView.context
+                    if (context is androidx.appcompat.app.AppCompatActivity) {
+                        context.runOnUiThread {
+                            context.supportActionBar?.title = title
+                        }
+                        if (id != null) {
+                            sendResult(id, buildJsonObject {
+                                put("success", true)
+                            })
+                        }
+                    } else {
+                        if (id != null) {
+                            sendError(id, "CONTEXT_ERROR", "Cannot set title: context is not an AppCompatActivity")
+                        }
+                    }
+                }
+                
+                "getNetworkStatus" -> {
+                    val connectivityManager = webView.context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                    
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        val network = connectivityManager.activeNetwork
+                        val capabilities = connectivityManager.getNetworkCapabilities(network)
+                        
+                        val online = capabilities != null
+                        val type = when {
+                            capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "wifi"
+                            capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "cellular"
+                            else -> "unknown"
+                        }
+                        
+                        if (id != null) {
+                            sendResult(id, buildJsonObject {
+                                put("online", online)
+                                put("type", type)
+                                put("effectiveType", "4g")
+                            })
+                        }
+                    } else {
+                        @Suppress("DEPRECATION")
+                        val networkInfo = connectivityManager.activeNetworkInfo
+                        val online = networkInfo?.isConnected == true
+                        
+                        if (id != null) {
+                            sendResult(id, buildJsonObject {
+                                put("online", online)
+                                put("type", "unknown")
+                                put("effectiveType", "unknown")
+                            })
+                        }
                     }
                 }
                 
