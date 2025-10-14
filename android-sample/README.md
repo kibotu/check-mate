@@ -1,4 +1,4 @@
-# Android JavaScript Bridge Sample [badge]
+# Android JavaScript Bridge Sample [![Android CI](https://github.com/kibotu/check-mate/actions/workflows/android.yml/badge.svg)](https://github.com/kibotu/check-mate/actions/workflows/android.yml)
 
 A complete Android sample app demonstrating the JavaScript Bridge Specification implementation for bidirectional communication between WebView and native Android code.
 
