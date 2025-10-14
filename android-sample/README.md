@@ -1,4 +1,4 @@
-# Android JavaScript Bridge Sample
+# Android JavaScript Bridge Sample [badge]
 
 A complete Android sample app demonstrating the JavaScript Bridge Specification implementation for bidirectional communication between WebView and native Android code.
 
