@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest  # 👈 macOS required for Xcode
+    runs-on: macos-latest
 
     defaults:
       run:
