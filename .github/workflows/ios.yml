@@ -1,0 +1,43 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "ios-sample/**"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "ios-sample/**"
+
+jobs:
+  build:
+    runs-on: macos-latest  # 👈 macOS required for Xcode
+
+    defaults:
+      run:
+        working-directory: ios-sample
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Install dependencies
+        run: |
+          if [ -f "Podfile" ]; then
+            sudo gem install cocoapods
+            pod install --repo-update
+          fi
+
+      - name: Build iOS app
+        run: |
+          xcodebuild \
+            -workspace YourApp.xcworkspace \
+            -scheme YourApp \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            clean build

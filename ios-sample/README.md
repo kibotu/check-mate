@@ -1,4 +1,4 @@
-# iOS Bridge Sample App
+# iOS Bridge Sample App  [![iOS CI](https://github.com/kibotu/check-mate/actions/workflows/ios.yml/badge.svg)](https://github.com/kibotu/check-mate/actions/workflows/ios.yml)
 
 A complete iOS sample app demonstrating the JavaScript Bridge specification for bidirectional communication between native iOS and WebView.
 
