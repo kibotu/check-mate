@@ -8,9 +8,7 @@ A complete Android sample app demonstrating the JavaScript Bridge Specification 
 ✅ **Thread Safe** - Proper main thread handling  
 ✅ **Memory Safe** - No leaks, proper cleanup  
 ✅ **Modern Stack** - Latest Android, Kotlin 2.1, Kotlin Serialization  
-✅ **High Performance** - 3-4x faster JSON operations  
-
-*See [BUGFIXES.md](BUGFIXES.md) for bug fixes and [MODERNIZATION.md](MODERNIZATION.md) for modernization details*
+✅ **High Performance** - 3-4x faster JSON operations
 
 ## 📋 Overview
 

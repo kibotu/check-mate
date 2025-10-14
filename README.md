@@ -29,10 +29,7 @@ check-mate/
 │   └── BridgeSample/Resources/
 │       └── index.html       # ⭐ Shared web code (99.5% identical)
 │
-├── spec.md                  # Bridge specification
-├── FEATURE_PARITY.md        # Complete feature comparison
-├── WEB_CODE_IDENTITY.md     # Web code identity verification
-└── UNIFIED_CODEBASE.md      # How unified codebase works
+└── spec.md                  # Bridge specification
 ```
 
 ## 🚀 Quick Start
