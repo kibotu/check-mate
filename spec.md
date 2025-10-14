@@ -148,14 +148,15 @@ All messages are JSON objects with this structure:
 
 ```json
 {
+  "version": "1.0",            // Schema version (always "1.0" for now)
   "data": {
-    "action": "string",      // Required: The command/action to execute
-    "content": {}            // Optional: The payload/parameters
+    "action": "string",        // Required: The command/action to execute
+    "content": {}              // Optional: The payload/parameters
   }
 }
 ```
 
-**That's it.** Everything is in `data.action` and `data.content`.
+**That's it.** Everything is in `data.action` and `data.content`. The `version` field tracks the message schema version for future compatibility.
 
 ### Internal Format (Bridge Implementation Detail)
 
@@ -163,11 +164,12 @@ The bridge internally adds an `id` for request-response tracking:
 
 ```json
 {
+  "version": "1.0",
   "data": {
     "action": "string",
     "content": {}
   },
-  "id": "string"             // Added by bridge for awaited calls
+  "id": "string"               // Added by bridge for awaited calls
 }
 ```
 
@@ -228,6 +230,7 @@ interface Bridge {
 }
 
 interface BridgeMessage {
+  version: string;   // Schema version (e.g., "1.0")
   data: {
     action: string;
     content?: any;
@@ -439,8 +442,8 @@ Full production-ready bridge (~200 lines):
       const { timeout = 30000, signal } = options;
       const id = Math.random().toString(36).substr(2, 9);
       
-      // Add id to message for request-response pattern
-      const messageWithId = { ...message, id };
+      // Add version and id to message
+      const messageWithId = { version: '1.0', ...message, id };
       
       return new Promise((resolve, reject) => {
         // Setup timeout
@@ -517,7 +520,7 @@ Full production-ready bridge (~200 lines):
         
         // If message has id, send response back
         if (message.id && result !== undefined) {
-          const response = { id: message.id, result };
+          const response = { version: '1.0', id: message.id, result };
           
           if (window.webkit?.messageHandlers?.bridge) {
             window.webkit.messageHandlers.bridge.postMessage(response);
@@ -529,6 +532,7 @@ Full production-ready bridge (~200 lines):
         // Send error back if message expects response
         if (message.id) {
           const response = {
+            version: '1.0',
             id: message.id,
             error: { code: 'JS_ERROR', message: error.message }
           };
@@ -611,7 +615,7 @@ func userContentController(_ userContentController: WKUserContentController, did
 
 // Send result back to web
 func sendResult(id: String, result: Any) {
-  let response: [String: Any] = ["id": id, "result": result]
+  let response: [String: Any] = ["version": "1.0", "id": id, "result": result]
   if let jsonData = try? JSONSerialization.data(withJSONObject: response),
      let jsonString = String(data: jsonData, encoding: .utf8) {
     let js = "window.bridge._onNativeResponse(\(jsonString))"
@@ -622,6 +626,7 @@ func sendResult(id: String, result: Any) {
 // Send error back to web
 func sendError(id: String, code: String, message: String) {
   let response: [String: Any] = [
+    "version": "1.0",
     "id": id,
     "error": ["code": code, "message": message]
   ]
@@ -635,6 +640,7 @@ func sendError(id: String, code: String, message: String) {
 // Call web (fire-and-forget)
 func sendEventToWeb(action: String, content: [String: Any]) {
   let message: [String: Any] = [
+    "version": "1.0",
     "data": ["action": action, "content": content]
   ]
   if let jsonData = try? JSONSerialization.data(withJSONObject: message),
@@ -706,6 +712,7 @@ class BridgeInterface(private val webView: WebView) {
   // Helper: Send result back to web (must run on main thread)
   private fun sendResult(id: String, result: JSONObject) {
     val response = JSONObject().apply {
+      put("version", "1.0")
       put("id", id)
       put("result", result)
     }
@@ -716,6 +723,7 @@ class BridgeInterface(private val webView: WebView) {
   // Helper: Send error back to web (must run on main thread)
   private fun sendError(id: String, code: String, message: String) {
     val response = JSONObject().apply {
+      put("version", "1.0")
       put("id", id)
       put("error", JSONObject().apply {
         put("code", code)
@@ -730,6 +738,7 @@ class BridgeInterface(private val webView: WebView) {
 // Call web (fire-and-forget)
 fun sendEventToWeb(action: String, content: Map<String, Any>) {
   val message = JSONObject().apply {
+    put("version", "1.0")
     put("data", JSONObject().apply {
       put("action", action)
       put("content", JSONObject(content))
