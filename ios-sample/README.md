@@ -67,7 +67,7 @@ iPhone 16 Pro Max (96A52C46-65B2-4706-8997-38C45AC9623A) (Shutdown)
 iPhone 17 Pro Max (6E61BF3A-F907-4617-898B-1CA4C8EAD012) (Shutdown)
 ```
 
-#### Step 2: Build the Project
+#### Step 2: Build the Project 
 
 ```bash
 cd ios-sample

@@ -13,7 +13,6 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-
     defaults:
       run:
         working-directory: ios-sample
@@ -27,10 +26,22 @@ jobs:
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           xcodebuild -version
 
+      - name: Detect Xcode project
+        id: detect_project
+        run: |
+          PROJECT_FILE=$(find . -name "*.xcodeproj" -maxdepth 1 | head -n 1)
+          echo "project=$PROJECT_FILE" >> $GITHUB_OUTPUT
+
+      - name: Detect scheme
+        id: detect_scheme
+        run: |
+          SCHEME=$(xcodebuild -list -json -project ${{ steps.detect_project.outputs.project }} | jq -r '.project.schemes[0]')
+          echo "scheme=$SCHEME" >> $GITHUB_OUTPUT
+
       - name: Build iOS app
         run: |
           xcodebuild \
-            -project BridgeSample.xcodeproj \
-            -scheme BridgeSample \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -project ${{ steps.detect_project.outputs.project }} \
+            -scheme ${{ steps.detect_scheme.outputs.scheme }} \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             clean build
