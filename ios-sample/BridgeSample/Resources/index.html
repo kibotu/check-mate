@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bridge Sample</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #ed8936;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.ready {
+            background: #48bb78;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 2px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        button.secondary {
+            background: #764ba2;
+        }
+        
+        button.danger {
+            background: #f56565;
+        }
+        
+        button.success {
+            background: #48bb78;
+        }
+        
+        .output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        
+        .output-line {
+            margin-bottom: 4px;
+            word-wrap: break-word;
+        }
+        
+        .output-line.error {
+            color: #fc8181;
+        }
+        
+        .output-line.success {
+            color: #68d391;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .info-value {
+            color: #718096;
+            text-align: right;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌉 Bridge Sample</h1>
+        
+        <!-- Status Card -->
+        <div class="card">
+            <div class="status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">Checking bridge...</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="toggleDebug()" style="flex: 1;">Toggle Debug</button>
+                <button onclick="clearOutput()" class="secondary" style="flex: 1;">Clear Log</button>
+            </div>
+        </div>
+        
+        <!-- Device Info -->
+        <div class="card">
+            <h2>📱 Device & System</h2>
+            <div class="button-grid">
+                <button onclick="getDeviceInfo()">Device Info</button>
+                <button onclick="requestCamera()">Camera Permission</button>
+                <button onclick="openSettings()">Open Settings</button>
+                <button onclick="copyText()">Copy to Clipboard</button>
+            </div>
+        </div>
+        
+        <!-- UI Actions -->
+        <div class="card">
+            <h2>💬 UI Actions</h2>
+            <div class="button-grid">
+                <button onclick="showToast()" class="success">Show Toast</button>
+                <button onclick="showAlert()">Show Alert</button>
+                <button onclick="setTitle()">Set Title</button>
+                <button onclick="openUrl()">Open URL</button>
+            </div>
+        </div>
+        
+        <!-- Storage -->
+        <div class="card">
+            <h2>💾 Storage</h2>
+            <div class="button-grid">
+                <button onclick="saveData()">Save Data</button>
+                <button onclick="loadData()">Load Data</button>
+                <button onclick="removeData()" class="danger">Remove Data</button>
+            </div>
+        </div>
+        
+        <!-- Analytics -->
+        <div class="card">
+            <h2>📊 Analytics (Fire & Forget)</h2>
+            <div class="button-grid">
+                <button onclick="trackEvent()">Track Event</button>
+                <button onclick="trackScreen()">Track Screen</button>
+                <button class="full-width" onclick="runAllTests()">🧪 Run All Tests</button>
+            </div>
+        </div>
+        
+        <!-- Device Info Display -->
+        <div class="card" id="deviceInfoCard" style="display: none;">
+            <h2>Device Information</h2>
+            <div id="deviceInfo"></div>
+        </div>
+        
+        <!-- Output Log -->
+        <div class="card">
+            <h2>📋 Console Output</h2>
+            <div class="output" id="output">
+                <div class="output-line">Waiting for bridge...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let debugEnabled = false;
+        
+        // Initialize bridge when ready
+        async function init() {
+            log('Initializing app...');
+            
+            if (!window.bridge) {
+                log('ERROR: Bridge not available! Running in browser?', 'error');
+                document.getElementById('statusText').textContent = 'Bridge not available';
+                return;
+            }
+            
+            log('Bridge found, waiting for ready state...');
+            
+            try {
+                await window.bridge.ready();
+                log('Bridge is ready!', 'success');
+                
+                document.getElementById('statusIndicator').classList.add('ready');
+                document.getElementById('statusText').textContent = 'Bridge Ready ✓';
+                
+                // Register handler for incoming messages from native
+                window.bridge.on(handleNativeMessage);
+                log('Registered native message handler', 'success');
+                
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Handle incoming messages from native
+        async function handleNativeMessage(message) {
+            const { action, content } = message.data;
+            log(`Received from native: ${action}`, 'success');
+            
+            switch (action) {
+                case 'testEvent':
+                    log(`Test event received: ${content.message}`);
+                    return; // No response needed
+                    
+                case 'getWebState':
+                    // Return current web state
+                    return {
+                        scrollPosition: window.scrollY,
+                        url: window.location.href,
+                        timestamp: Date.now()
+                    };
+                    
+                default:
+                    log(`Unknown action from native: ${action}`, 'error');
+                    return { error: { code: 'UNKNOWN_ACTION', message: `Unknown action: ${action}` } };
+            }
+        }
+        
+        // Device & System Actions
+        async function getDeviceInfo() {
+            try {
+                const info = await window.bridge.call({
+                    data: { action: 'getDeviceInfo' }
+                });
+                
+                log('Device info received', 'success');
+                displayDeviceInfo(info);
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function requestCamera() {
+            try {
+                const result = await window.bridge.call({
+                    data: {
+                        action: 'requestPermission',
+                        content: { permission: 'camera' }
+                    }
+                }, { timeout: 10000 });
+                
+                log(`Camera permission: ${result.granted ? 'Granted ✓' : 'Denied ✗'}`, result.granted ? 'success' : 'error');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function openSettings() {
+            try {
+                await window.bridge.call({
+                    data: { action: 'openSettings' }
+                });
+                log('Opening settings...', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function copyText() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'copyToClipboard',
+                        content: { text: 'Hello from WebView Bridge!' }
+                    }
+                });
+                log('Text copied to clipboard ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function openUrl() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'openUrl',
+                        content: { 
+                            url: 'https://github.com',
+                            external: true
+                        }
+                    }
+                });
+                log('Opening URL...', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // UI Actions
+        async function showToast() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'showToast',
+                        content: {
+                            message: 'Hello from Bridge!',
+                            duration: 'short'
+                        }
+                    }
+                });
+                log('Toast shown ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function showAlert() {
+            try {
+                const result = await window.bridge.call({
+                    data: {
+                        action: 'showAlert',
+                        content: {
+                            title: 'Bridge Alert',
+                            message: 'This alert is shown from the native side!',
+                            buttons: [
+                                { title: 'OK', style: 'default' },
+                                { title: 'Cancel', style: 'cancel' }
+                            ]
+                        }
+                    }
+                });
+                log(`Alert result: ${result.button} clicked`, 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function setTitle() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'setTitle',
+                        content: { title: '🎉 New Title!' }
+                    }
+                });
+                log('Title updated ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Storage Actions
+        async function saveData() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'setSecureData',
+                        content: {
+                            key: 'testData',
+                            value: { message: 'Hello Bridge!', timestamp: Date.now() }
+                        }
+                    }
+                });
+                log('Data saved ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadData() {
+            try {
+                const result = await window.bridge.call({
+                    data: {
+                        action: 'getSecureData',
+                        content: { key: 'testData' }
+                    }
+                });
+                
+                if (result.value) {
+                    log(`Data loaded: ${JSON.stringify(result.value)}`, 'success');
+                } else {
+                    log('No data found', 'error');
+                }
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function removeData() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'removeSecureData',
+                        content: { key: 'testData' }
+                    }
+                });
+                log('Data removed ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Analytics Actions (Fire-and-forget - no await)
+        function trackEvent() {
+            window.bridge.call({
+                data: {
+                    action: 'trackEvent',
+                    content: {
+                        event: 'button_click',
+                        properties: {
+                            screen: 'home',
+                            timestamp: Date.now()
+                        }
+                    }
+                }
+            });
+            log('Event tracked (fire & forget)', 'success');
+        }
+        
+        function trackScreen() {
+            window.bridge.call({
+                data: {
+                    action: 'trackScreen',
+                    content: {
+                        screen: 'sample_screen',
+                        properties: {
+                            timestamp: Date.now()
+                        }
+                    }
+                }
+            });
+            log('Screen tracked (fire & forget)', 'success');
+        }
+        
+        // Test all features
+        async function runAllTests() {
+            log('🧪 Running all tests...', 'success');
+            
+            const tests = [
+                { name: 'Device Info', fn: getDeviceInfo },
+                { name: 'Copy Text', fn: copyText },
+                { name: 'Save Data', fn: saveData },
+                { name: 'Load Data', fn: loadData },
+                { name: 'Track Event', fn: trackEvent }
+            ];
+            
+            for (const test of tests) {
+                log(`Testing: ${test.name}...`);
+                try {
+                    await test.fn();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } catch (error) {
+                    log(`Test failed: ${test.name} - ${error.message}`, 'error');
+                }
+            }
+            
+            log('✅ All tests completed!', 'success');
+        }
+        
+        // Utility functions
+        function toggleDebug() {
+            debugEnabled = !debugEnabled;
+            window.bridge?.setDebug(debugEnabled);
+            log(`Debug mode: ${debugEnabled ? 'ON' : 'OFF'}`, 'success');
+        }
+        
+        function displayDeviceInfo(info) {
+            const card = document.getElementById('deviceInfoCard');
+            const container = document.getElementById('deviceInfo');
+            
+            container.innerHTML = Object.entries(info)
+                .map(([key, value]) => {
+                    const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                    return `
+                        <div class="info-row">
+                            <span class="info-label">${key}</span>
+                            <span class="info-value">${displayValue}</span>
+                        </div>
+                    `;
+                })
+                .join('');
+            
+            card.style.display = 'block';
+        }
+        
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${message}`;
+            
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+            
+            console.log(`[Bridge Sample] ${message}`);
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+            log('Console cleared');
+        }
+        
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
+
