@@ -18,21 +18,17 @@ A minimal, JSON-based bidirectional communication bridge between native iOS/Andr
 1. [Quick Reference](#quick-reference)
 2. [Core API](#core-api)
 3. [Message Format](#message-format)
-4. [Usage Examples](#usage-examples)
-5. [TypeScript Interface](#typescript-interface)
-6. [Design Considerations](#design-considerations)
-7. [API Design Philosophy](#api-design-philosophy)
-8. [Common Actions to Implement](#common-actions-to-implement)
-9. [Platform-Specific Implementation](#platform-specific-implementation)
+4. [TypeScript Interface](#typescript-interface)
+5. [API Design Philosophy](#api-design-philosophy)
+6. [Usage Examples](#usage-examples)
+7. [Platform-Specific Implementation](#platform-specific-implementation)
    - [Web-Side Bridge Implementation](#web-side-bridge-implementation)
    - [iOS (WKWebView)](#ios-wkwebview)
    - [Android (WebView)](#android-webview)
-10. [Testing Strategy](#testing-strategy)
-11. [Security Checklist](#security-checklist)
-12. [Performance Considerations](#performance-considerations)
-13. [Implementation Roadmap](#implementation-roadmap)
-14. [Migration & Versioning](#migration--versioning)
-15. [Critical Implementation Notes](#critical-implementation-notes)
+8. [Common Actions to Implement](#common-actions-to-implement)
+9. [Testing](#testing)
+10. [Security & Performance](#security--performance)
+11. [Implementation Roadmap](#implementation-roadmap)
 
 ---
 
@@ -132,10 +128,8 @@ Register a global handler for all incoming messages.
 window.bridge.on(async (message) => {
   const { action, content } = message.data;
   
-  // Handle the action
   switch (action) {
     case 'someAction':
-      // Return value if native expects response, or return nothing
       return { result: 'value' };
     default:
       return { error: 'Unknown action' };
@@ -190,135 +184,21 @@ Responses are just JSON. Return whatever you want:
 
 ### Error Format
 
-If the action is not supported or fails:
-
 ```json
 {
   "error": {
-    "code": "UNKNOWN_ACTION",     // Error code
+    "code": "UNKNOWN_ACTION",
     "message": "Action 'foo' not supported"
   }
 }
 ```
 
----
-
-## Usage Examples
-
-### Web Side
-
-```javascript
-// Fire-and-forget: Just call without awaiting
-window.bridge.call({
-  data: {
-    action: 'trackEvent',
-    content: {
-      event: 'button_click',
-      screen: 'home'
-    }
-  }
-});
-
-// Request-response: Await for result
-try {
-  const result = await window.bridge.call({
-    data: {
-      action: 'getUserProfile',
-      content: { userId: '123' }
-    }
-  });
-  console.log("Profile:", result);  // Direct result
-} catch (error) {
-  console.error("Error:", error.message);
-}
-
-// With timeout option
-try {
-  const result = await window.bridge.call({
-    data: {
-      action: 'requestPermission',
-      content: { permission: 'camera' }
-    }
-  }, { timeout: 5000 });
-  
-  console.log("Granted:", result);
-} catch (error) {
-  console.error("Denied:", error.message);
-}
-
-// Handle incoming messages from native
-window.bridge.on(async (message) => {
-  const { action, content } = message.data;
-  
-  switch (action) {
-    case 'processPayment':
-      // Request-response: return value
-      const result = await processPayment(content);
-      return { success: true, result };
-      
-    case 'appStateChanged':
-      // Fire-and-forget: no return value
-      console.log("App state:", content.state);
-      await handleStateChange(content.state);
-      return; // Or just don't return
-      
-    default:
-      return { error: { code: 'UNKNOWN_ACTION', message: `Unknown action: ${action}` } };
-  }
-});
-```
-
-### Native Side (Pseudocode)
-
-```swift
-// iOS Example
-
-// Handle incoming messages from web
-func handleWebMessage(message: JSON) {
-  let action = message["data"]["action"] as? String
-  let content = message["data"]["content"] as? JSON
-  let id = message["id"] as? String  // Present if web expects response
-  
-  switch action {
-    case "getUserProfile":
-      let profile = getUserProfile(content["userId"])
-      if let id = id {
-        // Has ID = send response back
-        sendResult(id: id, result: profile)
-      }
-      
-    case "trackEvent":
-      // No ID = fire-and-forget
-      trackEvent(content["event"], content["screen"])
-      
-    default:
-      if let id = id {
-        sendError(id: id, error: [
-          "error": [
-            "code": "UNKNOWN_ACTION",
-            "message": "Action '\(action)' not supported"
-          ]
-        ])
-      }
-  }
-}
-
-// Call web (fire-and-forget)
-bridge.sendToWeb([
-  "data": [
-    "action": "appStateChanged",
-    "content": ["state": "background"]
-  ]
-])
-
-// Call web (request-response)
-let result = await bridge.callWeb([
-  "data": [
-    "action": "processPayment",
-    "content": ["amount": 99.99]
-  ]
-])
-```
+**Standard Error Codes:**
+- `TIMEOUT` - Request timed out
+- `NOT_IMPLEMENTED` - Action not implemented
+- `INVALID_PARAMS` - Invalid parameters
+- `PERMISSION_DENIED` - Permission denied
+- `UNKNOWN_ACTION` - Action not recognized
 
 ---
 
@@ -330,18 +210,16 @@ interface Bridge {
   readonly isReady: boolean;
   readonly version: string;
   
-  // Lifecycle - async function, use with await
-  // Usage: await window.bridge.ready()
+  // Lifecycle
   ready(): Promise<void>;
   
-  // Web → Native - async function, use with await (or don't await for fire-and-forget)
-  // Usage: await window.bridge.call({ data: { action: '...', content: {} } })
+  // Web → Native
   call<T = any>(
     message: BridgeMessage,
     options?: CallOptions
   ): Promise<T>;
   
-  // Native → Web (receive JSON)
+  // Native → Web
   on(handler: MessageHandler): void;
   off(): void;
   
@@ -351,14 +229,14 @@ interface Bridge {
 
 interface BridgeMessage {
   data: {
-    action: string;      // The command/action to execute
-    content?: any;       // The payload/parameters
+    action: string;
+    content?: any;
   };
 }
 
 interface CallOptions {
   timeout?: number;      // milliseconds (default: 30000)
-  signal?: AbortSignal;  // AbortController support (optional)
+  signal?: AbortSignal;  // AbortController support
 }
 
 interface BridgeError extends Error {
@@ -366,10 +244,8 @@ interface BridgeError extends Error {
   details?: any;
 }
 
-// Handler can be sync or async
 type MessageHandler = (message: BridgeMessage) => any | Promise<any> | void;
 
-// Global declaration
 declare global {
   interface Window {
     bridge: Bridge;
@@ -377,230 +253,32 @@ declare global {
 }
 ```
 
-**Note on TypeScript and Async/Await:**
-
-In TypeScript, `Promise<T>` is the return type of `async` functions. When you write:
-```typescript
-async function foo(): Promise<string> { ... }
-```
-You call it with:
-```typescript
-const result = await foo();  // result is string, not Promise<string>
-```
-
-The `Promise<T>` in the type signature indicates it's an async function that should be awaited. This is TypeScript's way of representing async functions - you don't use `.then()` chains, you use `await`.
-
----
-
-## Design Considerations
-
-### Ready State Detection
-
-The bridge might not be ready immediately:
-
-```javascript
-// Check if bridge is available and ready
-if (window.bridge?.isReady) {
-  const info = await window.bridge.call({
-    data: { action: 'getDeviceInfo' }
-  });
-}
-
-// Async ready check (preferred)
-await window.bridge.ready();
-const info = await window.bridge.call({
-  data: { action: 'getDeviceInfo' }
-});
-
-// Or wait for ready event
-window.addEventListener('bridgeReady', async () => {
-  const info = await window.bridge.call({
-    data: { action: 'getDeviceInfo' }
-  });
-  console.log(info);
-});
-```
-
-### Timeout Handling
-
-Calls can hang forever if native doesn't respond:
-
-```javascript
-// Built-in timeout (default: 30 seconds)
-try {
-  const result = await window.bridge.call({
-    data: {
-      action: 'slowOperation',
-      content: { /* params */ }
-    }
-  }, { timeout: 5000 });  // 5 seconds
-  
-} catch (error) {
-  if (error.code === 'TIMEOUT') {
-    console.error('Operation timed out');
-  }
-}
-
-// Optional: AbortController for manual cancellation
-const controller = new AbortController();
-try {
-  const result = await window.bridge.call({
-    data: {
-      action: 'longOperation',
-      content: { /* params */ }
-    }
-  }, { signal: controller.signal });
-  
-} catch (error) {
-  if (error.name === 'AbortError') {
-    console.log('Operation cancelled');
-  }
-}
-
-// Cancel from elsewhere
-setTimeout(() => controller.abort(), 3000);
-```
-
-### Handler Registration
-
-Register a single global handler for incoming calls from native:
-
-```javascript
-// Register ONE global handler (can be async)
-window.bridge.on(async (message) => {
-  const { action, content } = message.data;
-  
-  switch (action) {
-    case 'locationUpdate':
-      // Fire-and-forget event
-      console.log("New location:", content.lat, content.lon);
-      await updateMapPosition(content.lat, content.lon);
-      return; // No response
-      
-    case 'getWebData':
-      // Request-response pattern
-      const data = await fetchData(content.query);
-      return { data };  // Sent back to native
-      
-    default:
-      return { error: { code: 'UNKNOWN_ACTION' } };
-  }
-});
-
-// Remove handler
-window.bridge.off();
-```
-
-### Bridge Availability Check
-
-Web needs to detect if running in native or browser:
-
-```javascript
-// Check if running in native app
-const isNative = !!window.bridge;
-
-// Feature detection pattern (recommended)
-if (window.bridge) {
-  // Native-specific code
-  await window.bridge.call({
-    data: { action: 'nativeFeature' }
-  });
-} else {
-  // Browser fallback
-  console.log('Running in browser');
-}
-```
-
-### Message Queue Before Ready
-
-Queue calls sent before bridge is ready:
-
-```javascript
-// Calls are automatically queued if bridge not ready
-window.bridge.call({
-  data: {
-    action: 'trackEvent',
-    content: { event: 'early' }
-  }
-});
-// ↑ Queued internally and flushed when bridge becomes ready
-
-// Awaited calls wait for ready automatically
-const info = await window.bridge.call({
-  data: { action: 'getInfo' }
-});
-// ↑ Automatically waits for bridge to be ready
-```
-
-### Error Codes Standard
-
-Define standard error codes:
-
-```javascript
-const ErrorCodes = {
-  TIMEOUT: "TIMEOUT",
-  NOT_IMPLEMENTED: "NOT_IMPLEMENTED",
-  INVALID_PARAMS: "INVALID_PARAMS",
-  PERMISSION_DENIED: "PERMISSION_DENIED",
-  NETWORK_ERROR: "NETWORK_ERROR",
-  UNKNOWN: "UNKNOWN",
-  UNKNOWN_ACTION: "UNKNOWN_ACTION"
-};
-```
-
-### Size Limits
-
-JSON serialization has limits. Define max message size (e.g., 1MB):
-
-```javascript
-const MAX_MESSAGE_SIZE = 1024 * 1024; // 1MB
-```
-
-For large data (images, files), use separate transfer mechanism.
-
-### Debug Mode
-
-Enable detailed logging for development:
-
-```javascript
-window.bridge.setDebug(true);
-```
-
 ---
 
 ## API Design Philosophy
 
-### Evolution from Complex to Simple
+### Why This Design?
 
 **Traditional Approach: Multiple methods, multiple parameters**
 ```javascript
-window.bridge.send("track", { event: "click" });           // Fire-and-forget
-window.bridge.call("getUser", { id: 123 });                // Request-response
-window.bridge.handle("payment", handler);                  // Handle requests
-window.bridge.on("event", listener);                       // Listen to events
+window.bridge.send("track", { event: "click" });
+window.bridge.call("getUser", { id: 123 });
+window.bridge.handle("payment", handler);
+window.bridge.on("event", listener);
 ```
 
 **This Design: Two methods, pure JSON**
 ```javascript
-// ONE method for web→native (await = response, no await = fire-and-forget)
-// Just pass JSON
-window.bridge.call({
-  data: { action: "track", content: { event: "click" } }
-});
+// ONE method for web→native
+window.bridge.call({ data: { action: "track", content: { event: "click" } } });
+await window.bridge.call({ data: { action: "getUser", content: { id: 123 } } });
 
-await window.bridge.call({
-  data: { action: "getUser", content: { id: 123 } }
-});
-
-// ONE global handler for native→web (return value = response, no return = event)
+// ONE handler for native→web
 window.bridge.on(async (message) => {
   const { action, content } = message.data;
-  
   switch (action) {
-    case 'payment':
-      return { result };  // Response
-    case 'event':
-      // No return = fire-and-forget
+    case 'payment': return { result };
+    case 'event': return; // fire-and-forget
   }
 });
 ```
@@ -608,100 +286,126 @@ window.bridge.on(async (message) => {
 ### Key Advantages
 
 1. **Smaller API surface** = fewer versioning issues
-2. **Pure JSON everywhere**: No method names, no parameter parsing. Just JSON in, JSON out.
+2. **Pure JSON everywhere**: No method names, no parameter parsing
 3. **Self-documenting behavior**: 
-   - Await it? You want a response.
-   - Don't await? Fire-and-forget.
-   - Return value? Send it back.
-   - No return? Just an event.
-4. **Easier to implement**: One code path on each side, no parameter parsing
-5. **Future-proof**: No need to add methods for new patterns
-6. **Native controls the schema**: Native checks `data.action` and implements whatever it wants
+   - Await it? You want a response
+   - Don't await? Fire-and-forget
+   - Return value? Send it back
+   - No return? Just an event
+4. **Easier to implement**: One code path on each side
+5. **Future-proof**: Add new actions without touching bridge code
+6. **Native controls the schema**: Native decides what actions are valid
 
 ### Design Principles
 
-1. **Radically Minimal**: 
-   - Only 2 core methods total: `call()` and `on()`
-   - No `dispatch` vs `invoke` - just await or don't
-   - No multiple `on` handlers - one global handler with switch
-   
-2. **Pure JSON Everything**: 
-   - No method/param separation - just pass JSON
-   - Bridge doesn't parse structure - native does
-   - `{ data: { action: "...", content: {} } }` - that's it
-   - Native controls the schema
-   
-3. **Self-Documenting Behavior**: 
-   - `await bridge.call()` = I want a response
-   - `bridge.call()` = Fire-and-forget
-   - `return value` in handler = Send response back
-   - No return = Just an event
-   
-4. **Version-Proof**:
-   - Tiny API surface means zero breaking changes
-   - Add new actions without touching bridge
-   - Same bridge code works forever
-   
-5. **Modern JavaScript**:
-   - Async/await everywhere, no callbacks
-   - Generic TypeScript types for type safety
-   - Optional AbortSignal support for cancellation
-   
-6. **Developer Experience**:
-   - Direct result unwrapping (no `.result` access)
-   - Automatic queuing before ready
-   - Async `ready()` helper
-   
-7. **Production Ready**:
-   - Timeout handling
-   - Error code standards
-   - Debug mode
-   - Size limits
-   
-8. **Testable**: Simple mock implementation for browser testing
-
-9. **Platform Agnostic**: Same API works on iOS and Android
+1. **Radically Minimal**: Only 2 core methods: `call()` and `on()`
+2. **Pure JSON Everything**: Bridge doesn't parse structure - native does
+3. **Self-Documenting Behavior**: Usage pattern indicates intent
+4. **Version-Proof**: Tiny API surface = zero breaking changes
+5. **Modern JavaScript**: Async/await everywhere, no callbacks
+6. **Production Ready**: Timeout handling, error codes, debug mode
 
 ---
 
-## Common Actions to Implement
+## Usage Examples
 
-Here are typical actions you'll need:
+### Complete Web Example
 
-### Navigation & UI
-- `navigate(url, options)`
-- `goBack()`
-- `close()`
-- `setTitle(title)`
-- `showToast(message, duration)`
-- `showAlert(title, message, buttons)`
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    async function init() {
+      // Check if running in native app
+      if (!window.bridge) {
+        console.log("Running in browser");
+        return;
+      }
+      
+      // Wait for bridge to be ready
+      await window.bridge.ready();
+      
+      // Call native and await result
+      const deviceInfo = await window.bridge.call({
+        data: { action: 'getDeviceInfo' }
+      });
+      console.log("Device:", deviceInfo);
+      
+      // Fire-and-forget call (no await)
+      window.bridge.call({
+        data: {
+          action: 'trackEvent',
+          content: { event: 'page_load', timestamp: Date.now() }
+        }
+      });
+      
+      // Handle incoming messages from native
+      window.bridge.on(async (message) => {
+        const { action, content } = message.data;
+        
+        switch (action) {
+          case 'getWebState':
+            return { scrollPosition: window.scrollY, url: window.location.href };
+          case 'appStateChanged':
+            console.log('App state:', content.state);
+            return;
+          default:
+            return { error: { code: 'UNKNOWN_ACTION' } };
+        }
+      });
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</head>
+<body>
+  <button onclick="window.bridge.call({ data: { action: 'showToast', content: { message: 'Hello!' } } })">
+    Show Toast
+  </button>
+</body>
+</html>
+```
 
-### Device & System
-- `getDeviceInfo()` → OS, version, model, etc.
-- `requestPermission(type)` → camera, location, etc.
-- `openSettings()`
-- `share(content, options)`
-- `copyToClipboard(text)`
-- `openUrl(url, external)`
+### With Timeout and Error Handling
 
-### Storage
-- `getSecureData(key)`
-- `setSecureData(key, value)`
-- `removeSecureData(key)`
+```javascript
+try {
+  const result = await window.bridge.call({
+    data: {
+      action: 'requestPermission',
+      content: { permission: 'camera' }
+    }
+  }, { timeout: 5000 });
+  
+  console.log("Permission granted:", result.granted);
+} catch (error) {
+  if (error.code === 'TIMEOUT') {
+    console.error('Request timed out');
+  } else if (error.code === 'PERMISSION_DENIED') {
+    console.error('User denied permission');
+  }
+}
+```
 
-### Analytics & Tracking
-- `trackEvent(name, properties)`
-- `trackScreen(name, properties)`
-- `setUserId(id)`
+### With AbortController
 
-### Network
-- `fetch(url, options)` → Optionally use native networking
-- `getNetworkStatus()` → Online/offline, connection type
+```javascript
+const controller = new AbortController();
 
-### Lifecycle
-- `onAppBackground()`
-- `onAppForeground()`
-- `onWebViewReady()`
+// Cancel after 3 seconds
+setTimeout(() => controller.abort(), 3000);
+
+try {
+  const result = await window.bridge.call({
+    data: { action: 'longOperation' }
+  }, { signal: controller.signal });
+} catch (error) {
+  if (error.name === 'AbortError') {
+    console.log('Operation cancelled');
+  }
+}
+```
 
 ---
 
@@ -709,7 +413,7 @@ Here are typical actions you'll need:
 
 ### Web-Side Bridge Implementation
 
-The bridge JavaScript that needs to be injected:
+Full production-ready bridge (~200 lines):
 
 ```javascript
 (function() {
@@ -850,6 +554,15 @@ The bridge JavaScript that needs to be injected:
 })();
 ```
 
+**Key Implementation Details:**
+
+1. **Platform Detection**: Uses `window.webkit` for iOS, `window.AndroidBridge` for Android
+2. **Promise Management**: Tracks pending calls with timeouts
+3. **Error Handling**: Sends errors back when handler throws
+4. **Ready State**: Dispatches `bridgeReady` event when initialized
+
+---
+
 ### iOS (WKWebView)
 
 ```swift
@@ -896,7 +609,7 @@ func userContentController(_ userContentController: WKUserContentController, did
   }
 }
 
-// Helper: Send result back to web
+// Send result back to web
 func sendResult(id: String, result: Any) {
   let response: [String: Any] = ["id": id, "result": result]
   if let jsonData = try? JSONSerialization.data(withJSONObject: response),
@@ -906,7 +619,7 @@ func sendResult(id: String, result: Any) {
   }
 }
 
-// Helper: Send error back to web
+// Send error back to web
 func sendError(id: String, code: String, message: String) {
   let response: [String: Any] = [
     "id": id,
@@ -919,13 +632,10 @@ func sendError(id: String, code: String, message: String) {
   }
 }
 
-// Send event to web (fire-and-forget)
+// Call web (fire-and-forget)
 func sendEventToWeb(action: String, content: [String: Any]) {
   let message: [String: Any] = [
-    "data": [
-      "action": action,
-      "content": content
-    ]
+    "data": ["action": action, "content": content]
   ]
   if let jsonData = try? JSONSerialization.data(withJSONObject: message),
      let jsonString = String(data: jsonData, encoding: .utf8) {
@@ -933,31 +643,16 @@ func sendEventToWeb(action: String, content: [String: Any]) {
     webView.evaluateJavaScript(js, completionHandler: nil)
   }
 }
-
-// Example: Call web and await response
-func callWeb(action: String, content: [String: Any]) async throws -> Any {
-  let id = UUID().uuidString
-  let message: [String: Any] = [
-    "data": [
-      "action": action,
-      "content": content
-    ],
-    "id": id
-  ]
-  
-  // Store pending request and wait for response
-  // (Implementation depends on your response tracking mechanism)
-  return try await withCheckedThrowingContinuation { continuation in
-    pendingRequests[id] = continuation
-    
-    if let jsonData = try? JSONSerialization.data(withJSONObject: message),
-       let jsonString = String(data: jsonData, encoding: .utf8) {
-      let js = "window.bridge._onNativeMessage(\(jsonString))"
-      webView.evaluateJavaScript(js, completionHandler: nil)
-    }
-  }
-}
 ```
+
+**Critical iOS Points:**
+
+1. **JSON Serialization**: Must use `JSONSerialization` - don't manually build JSON strings
+2. **Thread Safety**: Use `DispatchQueue.main.async` for UI operations
+3. **Safe Unwrapping**: Use `guard` statements instead of force unwrapping
+4. **Injection Timing**: `.atDocumentStart` ensures bridge is ready before page loads
+
+---
 
 ### Android (WebView)
 
@@ -980,7 +675,7 @@ class BridgeInterface(private val webView: WebView) {
       val content = data.optJSONObject("content")
       val id = if (msg.has("id")) msg.getString("id") else null
       
-      // Handle on main thread
+      // CRITICAL: Post to main thread
       mainHandler.post {
         when (action) {
           "getDeviceInfo" -> {
@@ -989,9 +684,7 @@ class BridgeInterface(private val webView: WebView) {
               put("version", Build.VERSION.RELEASE)
               put("sdkInt", Build.VERSION.SDK_INT)
             }
-            if (id != null) {
-              sendResult(id, result)
-            }
+            if (id != null) sendResult(id, result)
           }
           
           "trackEvent" -> {
@@ -1001,9 +694,7 @@ class BridgeInterface(private val webView: WebView) {
           }
           
           else -> {
-            if (id != null) {
-              sendError(id, "UNKNOWN_ACTION", "Unknown action: $action")
-            }
+            if (id != null) sendError(id, "UNKNOWN_ACTION", "Unknown action: $action")
           }
         }
       }
@@ -1018,7 +709,7 @@ class BridgeInterface(private val webView: WebView) {
       put("id", id)
       put("result", result)
     }
-    val js = "window.bridge._onNativeResponse(${response})"
+    val js = "window.bridge._onNativeResponse($response)"
     webView.evaluateJavascript(js, null)
   }
   
@@ -1031,12 +722,12 @@ class BridgeInterface(private val webView: WebView) {
         put("message", message)
       })
     }
-    val js = "window.bridge._onNativeResponse(${response})"
+    val js = "window.bridge._onNativeResponse($response)"
     webView.evaluateJavascript(js, null)
   }
 }
 
-// Send event to web (fire-and-forget) - must run on main thread
+// Call web (fire-and-forget)
 fun sendEventToWeb(action: String, content: Map<String, Any>) {
   val message = JSONObject().apply {
     put("data", JSONObject().apply {
@@ -1044,47 +735,64 @@ fun sendEventToWeb(action: String, content: Map<String, Any>) {
       put("content", JSONObject(content))
     })
   }
-  val js = "window.bridge._onNativeMessage($message)"
   webView.post {
-    webView.evaluateJavascript(js, null)
-  }
-}
-
-// Example: Call web and await response
-suspend fun callWeb(action: String, content: Map<String, Any>): JSONObject = suspendCoroutine { continuation ->
-  val id = UUID.randomUUID().toString()
-  val message = JSONObject().apply {
-    put("data", JSONObject().apply {
-      put("action", action)
-      put("content", JSONObject(content))
-    })
-    put("id", id)
-  }
-  
-  // Store pending request
-  pendingRequests[id] = continuation
-  
-  // Send to web on main thread
-  webView.post {
-    val js = "window.bridge._onNativeMessage($message)"
-    webView.evaluateJavascript(js, null)
+    webView.evaluateJavascript("window.bridge._onNativeMessage($message)", null)
   }
 }
 ```
 
-**Important Android Notes:**
+**Critical Android Points:**
 
-1. **Threading**: `@JavascriptInterface` methods run on a background thread. Always post back to main thread for WebView operations.
+1. **Threading**: `@JavascriptInterface` runs on background thread - ALWAYS post to main thread for WebView operations
+2. **JSON Format**: Android needs string, iOS takes objects - use `JSON.stringify()` on web side
+3. **Security**: Only use with HTTPS or localhost (Android < 4.2 security issue)
+4. **Main Thread**: All `evaluateJavascript()` calls MUST run on main thread
 
-2. **Security**: `addJavascriptInterface` has security implications on Android < 4.2. Use only with HTTPS or localhost content.
+### Platform Differences Summary
 
-3. **JSON Serialization**: JSONObject's `toString()` is automatically called when used in string interpolation, which is correct for JavaScript.
+| Aspect | iOS (WKWebView) | Android (WebView) |
+|--------|-----------------|-------------------|
+| **Web→Native** | `window.webkit.messageHandlers.bridge.postMessage(obj)` | `window.AndroidBridge.postMessage(JSON.stringify(obj))` |
+| **Native→Web** | `webView.evaluateJavaScript(js)` | `webView.evaluateJavascript(js, null)` |
+| **Threading** | Usually safe (auto main thread) | **Must post to main thread!** |
+| **JSON Format** | Native JavaScript object | **Must stringify!** |
+| **Security** | Generally secure | **Requires HTTPS/localhost** |
 
 ---
 
-## Testing Strategy
+## Common Actions to Implement
 
-### Mock Bridge for Browser Testing
+Typical actions you'll need:
+
+### Navigation & UI
+- `navigate(url, options)` - Navigate to URL
+- `goBack()` - Go back
+- `close()` - Close webview
+- `showToast(message, duration)` - Show toast message
+- `showAlert(title, message, buttons)` - Show alert dialog
+
+### Device & System
+- `getDeviceInfo()` - Get OS, version, model
+- `requestPermission(type)` - Request camera, location, etc.
+- `share(content, options)` - Share content
+- `copyToClipboard(text)` - Copy to clipboard
+- `openUrl(url, external)` - Open URL externally
+
+### Storage
+- `getSecureData(key)` - Get from secure storage
+- `setSecureData(key, value)` - Store securely
+- `removeSecureData(key)` - Remove from storage
+
+### Analytics & Tracking
+- `trackEvent(name, properties)` - Track event
+- `trackScreen(name, properties)` - Track screen view
+- `setUserId(id)` - Set user ID
+
+---
+
+## Testing
+
+### Mock Bridge for Browser Development
 
 ```javascript
 if (!window.bridge) {
@@ -1100,153 +808,40 @@ if (!window.bridge) {
       const { action, content } = message.data;
       console.log(`[Mock] Call: ${action}`, content);
       
-      // Simulate async delay if timeout specified
-      if (options?.timeout) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
+      // Simulate delay
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Return mock data based on action
+      // Return mock data
       switch (action) {
         case 'getDeviceInfo':
-          return { platform: 'mock', version: '1.0', os: 'browser' };
+          return { platform: 'mock', version: '1.0' };
         case 'getUserProfile':
-          return { id: '123', name: 'Mock User', email: 'mock@example.com' };
-        case 'requestPermission':
-          return { granted: true };
-        case 'trackEvent':
-          return; // Fire-and-forget
+          return { id: '123', name: 'Mock User' };
         default:
-          return { success: true, mock: true };
+          return { success: true };
       }
     },
     
     on(handler) {
-      console.log('[Mock] Registered global handler');
       this._handler = handler;
     },
     
     off() {
-      console.log('[Mock] Removed handler');
       this._handler = null;
     },
     
     setDebug(enabled) {
-      console.log(`[Mock] Debug mode: ${enabled}`);
+      console.log(`[Mock] Debug: ${enabled}`);
     }
   };
 }
 ```
 
-### Complete Example
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <script>
-    async function init() {
-      // Check if running in native app
-      if (!window.bridge) {
-        console.log("Running in browser");
-        return;
-      }
-      
-      // Wait for bridge to be ready
-      await window.bridge.ready();
-      
-      // Call native and await result
-      const deviceInfo = await window.bridge.call({
-        data: { action: 'getDeviceInfo' }
-      });
-      console.log("Device:", deviceInfo);  // Direct result
-      
-      // Fire-and-forget call (no await)
-      window.bridge.call({
-        data: {
-          action: 'trackEvent',
-          content: {
-            event: 'page_load',
-            timestamp: Date.now()
-          }
-        }
-      });
-      
-      // Handle incoming messages from native
-      window.bridge.on(async (message) => {
-        const { action, content } = message.data;
-        
-        switch (action) {
-          case 'getWebState':
-            // Request-response: return value
-            return {
-              scrollPosition: window.scrollY,
-              url: window.location.href
-            };
-            
-          case 'appStateChanged':
-            // Fire-and-forget: no return
-            console.log('App state:', content.state);
-            if (content.state === 'background') {
-              await saveState();
-            }
-            return;
-            
-          default:
-            return { error: { code: 'UNKNOWN_ACTION' } };
-        }
-      });
-    }
-    
-    // Initialize on load
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-    
-    // Fire-and-forget: just call without awaiting
-    function showToast() {
-      window.bridge.call({
-        data: {
-          action: 'showToast',
-          content: {
-            message: 'Hello from WebView!',
-            duration: 'short'
-          }
-        }
-      });
-    }
-    
-    // Request-response: await the call
-    async function requestPermission() {
-      try {
-        const result = await window.bridge.call({
-          data: {
-            action: 'requestPermission',
-            content: { permission: 'camera' }
-          }
-        }, { timeout: 5000 });
-        
-        if (result.granted) {
-          console.log('Camera permission granted');
-        }
-      } catch (error) {
-        console.error('Permission denied:', error);
-      }
-    }
-  </script>
-</head>
-<body>
-  <h1>Bridge Demo</h1>
-  <button onclick="showToast()">Show Toast</button>
-  <button onclick="requestPermission()">Request Camera</button>
-</body>
-</html>
-```
-
 ---
 
-## Security Checklist
+## Security & Performance
+
+### Security Checklist
 
 - [ ] Validate origin of webview content
 - [ ] Whitelist allowed actions on native side
@@ -1254,130 +849,56 @@ if (!window.bridge) {
 - [ ] Use HTTPS for web content
 - [ ] Don't expose sensitive native APIs
 - [ ] Implement rate limiting for bridge calls
-- [ ] Log security-relevant bridge calls
-- [ ] Use Content Security Policy in webview
 - [ ] Never pass credentials through bridge
-- [ ] Implement action permissions system
 
----
+### Performance Best Practices
 
-## Performance Considerations
-
-- **Minimize bridge calls**: Group related data when possible
+- **Minimize calls**: Group related data when possible
 - **Keep messages small**: < 100KB ideal, < 1MB max
-- **Always use async/await**: Never block the UI thread
-- **Debounce frequent events**: Don't spam bridge with rapid calls
-- **For large data**: Use compression or separate transfer mechanism
+- **Always async/await**: Never block UI thread
+- **Debounce frequent events**: Don't spam bridge
+- **For large data**: Use separate transfer mechanism
 
 ---
 
 ## Implementation Roadmap
 
 ### Phase 1: Core (Day 1)
-
-1. **Core bridge implementation** (`call()`, `on()`)
-2. **Ready state detection** (`isReady`, `ready()`)
-3. **Timeout handling** (default 30s)
-4. **Basic error handling** (standard error codes)
-5. **Mock for browser testing**
+1. Core bridge implementation (`call()`, `on()`)
+2. Ready state detection (`isReady`, `ready()`)
+3. Timeout handling (default 30s)
+4. Basic error handling
+5. Mock for browser testing
 
 ### Phase 2: Essential Actions (Week 1)
-
-6. **3-5 essential native actions**:
+6. Implement 3-5 essential native actions:
    - `getDeviceInfo()` - device metadata
    - `navigate(url)` - navigation  
-   - `showToast(message)` - simple feedback
+   - `showToast(message)` - feedback
    - `requestPermission(type)` - permissions
-7. **Debug logging**
+7. Debug logging
 
 ### Phase 3: Polish (As Needed)
-
-8. **AbortSignal support** (optional - add later if needed)
-9. **Additional actions** based on real usage
-10. **Performance optimizations**
+8. AbortSignal support (optional)
+9. Additional actions based on usage
+10. Performance optimizations
 
 **That's it.** The entire bridge is ~200 lines of JavaScript. Don't add anything else unless you actually need it.
 
 ---
 
-## Migration & Versioning
+## Why This Approach Works
 
-### Version Management
+**The Problem with Most Bridges:**
+- Too complex: Multiple methods, event systems, parameter parsing
+- Or too simple: No error handling, timeouts, or proper async support
+- Versioning nightmares when adding features
 
-Include version in bridge for compatibility:
+**This Design:**
+- **~200 lines of JavaScript** - implementable in a day
+- **Pure JSON** - bridge doesn't parse, native does
+- **Zero versioning issues** - add new actions without touching bridge
+- **Production-ready** - timeouts, errors, AbortSignal support
+- **Self-documenting** - behavior emerges from usage patterns
 
-```javascript
-window.bridge.version = "1.0.0";
-```
-
-Web can check version and adjust behavior:
-
-```javascript
-const [major] = window.bridge.version.split('.');
-if (parseInt(major) < 2) {
-  // Use legacy API
-}
-
-// Semantic versioning check
-if (window.bridge.supportsFeature?.('batch')) {
-  window.bridge.batchDispatch([...]);
-} else {
-  // Fallback
-}
-```
-
-### Key Points
-
-- The entire bridge is ~200 lines of JavaScript
-- You can build and ship the core in a day
-- Add 5 essential native actions (just `switch` cases in native code) over the next week
-- Most bridge implementations fail because they're either too simple (no error handling) or too complex (unnecessary abstractions)
-- This is minimal but production-ready
-- Pure JSON in, pure JSON out
-- The bridge doesn't know or care what actions you're calling - that's between your web and native code
-
----
-
-## Critical Implementation Notes
-
-### Issues Found and Corrected in Platform Implementations
-
-**iOS (WKWebView):**
-1. ✅ **JSON Serialization**: Fixed incorrect string interpolation with JSON data
-2. ✅ **Thread Safety**: Added `DispatchQueue.main.async` for UI operations
-3. ✅ **Safe Unwrapping**: Changed force unwraps to safe `guard` statements
-4. ✅ **Helper Methods**: Added proper `sendResult` and `sendError` implementations
-5. ✅ **Response Tracking**: Added async/await example with proper continuation handling
-
-**Android (WebView):**
-1. ✅ **Threading**: Added `Handler(Looper.getMainLooper())` - critical! `@JavascriptInterface` runs on background thread
-2. ✅ **JSON Handling**: Fixed JSON string serialization for evaluateJavascript
-3. ✅ **Security Note**: Added warning about `addJavascriptInterface` security on Android < 4.2
-4. ✅ **Main Thread**: All WebView operations must run on main thread using `webView.post {}`
-5. ✅ **Error Handling**: Added try-catch around JSON parsing
-6. ✅ **Coroutines**: Added suspend function example for async operations
-
-**Web-Side Bridge:**
-1. ✅ **Complete Implementation**: Added full working bridge JavaScript
-2. ✅ **Platform Detection**: Properly detects iOS (`window.webkit`) vs Android (`window.AndroidBridge`)
-3. ✅ **Promise Management**: Implements proper pending call tracking with timeout
-4. ✅ **Error Handling**: Sends errors back when handler throws
-5. ✅ **Ready State**: Properly manages bridge ready state and event
-
-### Critical Platform Differences
-
-| Aspect | iOS (WKWebView) | Android (WebView) |
-|--------|-----------------|-------------------|
-| **Web→Native** | `window.webkit.messageHandlers.bridge.postMessage(obj)` | `window.AndroidBridge.postMessage(JSON.stringify(obj))` |
-| **Native→Web** | `webView.evaluateJavaScript(js)` | `webView.evaluateJavascript(js, null)` |
-| **Threading** | Usually safe (auto main thread) | **Must post to main thread!** |
-| **JSON Format** | Native JavaScript object | **Must stringify!** |
-| **Security** | Generally secure | **Requires HTTPS or localhost** |
-
-### Common Pitfalls to Avoid
-
-1. **Android Threading**: Never call `webView.evaluateJavascript()` from `@JavascriptInterface` thread
-2. **JSON Stringification**: iOS takes objects, Android needs strings
-3. **Error Responses**: Always send error responses for failed requests with IDs
-4. **Memory Leaks**: Clear pending requests on timeout or when WebView is destroyed
-5. **Security**: Validate all input from web, never use `eval()`, whitelist actions
+The bridge doesn't know or care what actions you're calling - that's between your web and native code. This separation means the bridge code never needs to change, only your action handlers.
