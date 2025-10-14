@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bridge Sample</title>
     <style>
         * {
@@ -13,9 +13,10 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
+            color: #333;
         }
         
         .container {
@@ -23,461 +24,616 @@
             margin: 0 auto;
         }
         
-        h1 {
-            color: white;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-        
-        .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
         .card {
             background: white;
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        .card h2 {
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        h2 {
             font-size: 18px;
-            margin-bottom: 15px;
-            color: #333;
+            margin-bottom: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #ed8936;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.ready {
+            background: #48bb78;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
         
         button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
             background: #667eea;
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
-            transition: background 0.2s;
-        }
-        
-        button:hover {
-            background: #5568d3;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
         }
         
         button:active {
             transform: scale(0.98);
+            box-shadow: 0 1px 2px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        button.secondary {
+            background: #764ba2;
+        }
+        
+        button.danger {
+            background: #f56565;
+        }
+        
+        button.success {
+            background: #48bb78;
         }
         
         .output {
-            background: #f7f7f7;
-            border-radius: 8px;
+            background: #2d3748;
+            color: #e2e8f0;
             padding: 12px;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
             font-size: 12px;
-            color: #333;
             max-height: 200px;
             overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
+            margin-top: 12px;
         }
         
-        .status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+        .output-line {
+            margin-bottom: 4px;
+            word-wrap: break-word;
+        }
+        
+        .output-line.error {
+            color: #fc8181;
+        }
+        
+        .output-line.success {
+            color: #68d391;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
             font-weight: 600;
-            margin-left: 10px;
+            color: #4a5568;
         }
         
-        .status.ready {
-            background: #10b981;
-            color: white;
+        .info-value {
+            color: #718096;
+            text-align: right;
         }
         
-        .status.error {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .event-log {
-            background: #1e293b;
-            color: #10b981;
-            border-radius: 8px;
-            padding: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        
-        .event-log .timestamp {
-            color: #64748b;
-        }
-        
-        .event-log .event {
-            color: #f59e0b;
-        }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        @media (max-width: 480px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
+        .full-width {
+            grid-column: 1 / -1;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌉 JavaScript Bridge</h1>
-        <p class="subtitle">Android WebView ↔ Native Communication Demo</p>
+        <h1>🌉 Bridge Sample</h1>
         
+        <!-- Status Card -->
         <div class="card">
-            <h2>
-                Bridge Status
-                <span id="bridgeStatus" class="status">Checking...</span>
-            </h2>
-            <p style="font-size: 14px; color: #666;">
-                Version: <strong id="bridgeVersion">-</strong><br>
-                Platform: <strong id="platform">-</strong>
-            </p>
-        </div>
-        
-        <div class="card">
-            <h2>📱 Device Info (Request-Response)</h2>
-            <button onclick="getDeviceInfo()">Get Device Info</button>
-            <div id="deviceInfoOutput" class="output" style="display: none;"></div>
-        </div>
-        
-        <div class="card">
-            <h2>💬 Toast Messages (Fire-and-Forget)</h2>
-            <div class="grid">
-                <button onclick="showToast('Hello from WebView!', 'short')">Show Short Toast</button>
-                <button onclick="showToast('This is a longer message!', 'long')">Show Long Toast</button>
+            <div class="status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">Checking bridge...</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="toggleDebug()" style="flex: 1;">Toggle Debug</button>
+                <button onclick="clearOutput()" class="secondary" style="flex: 1;">Clear Log</button>
             </div>
         </div>
         
+        <!-- Device Info -->
         <div class="card">
-            <h2>📊 Analytics (Fire-and-Forget)</h2>
-            <div class="grid">
-                <button onclick="trackEvent('button_click', { button: 'track_1' })">Track Event 1</button>
-                <button onclick="trackEvent('page_view', { page: 'demo' })">Track Event 2</button>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h2>🔐 Secure Storage (Request-Response)</h2>
-            <button onclick="saveData()">Save Secure Data</button>
-            <button onclick="loadData()">Load Secure Data</button>
-            <div id="storageOutput" class="output" style="display: none;"></div>
-        </div>
-        
-        <div class="card">
-            <h2>🎯 Permission Request (Request-Response)</h2>
-            <button onclick="requestPermission('camera')">Request Camera</button>
-            <button onclick="requestPermission('location')">Request Location</button>
-            <div id="permissionOutput" class="output" style="display: none;"></div>
-        </div>
-        
-        <div class="card">
-            <h2>📨 Native → Web Events</h2>
-            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">
-                Events received from native code:
-            </p>
-            <div id="eventLog" class="event-log">Waiting for events...</div>
-        </div>
-        
-        <div class="card">
-            <h2>🌐 Network & Settings</h2>
-            <div class="grid">
-                <button onclick="getNetworkStatus()">Network Status</button>
+            <h2>📱 Device & System</h2>
+            <div class="button-grid">
+                <button onclick="getDeviceInfo()">Device Info</button>
+                <button onclick="requestCamera()">Camera Permission</button>
+                <button onclick="requestLocation()">Location Permission</button>
                 <button onclick="openSettings()">Open Settings</button>
+                <button onclick="copyText()">Copy to Clipboard</button>
+                <button onclick="openUrl()">Open URL</button>
             </div>
         </div>
         
+        <!-- UI Actions -->
         <div class="card">
-            <h2>⚙️ Advanced Features</h2>
-            <button onclick="testTimeout()">Test Timeout (5s)</button>
-            <button onclick="testErrorHandling()">Test Error Handling</button>
-            <button onclick="toggleDebug()">Toggle Debug Mode</button>
-            <div id="advancedOutput" class="output" style="display: none;"></div>
+            <h2>💬 UI Actions</h2>
+            <div class="button-grid">
+                <button onclick="showToast()" class="success">Show Toast</button>
+                <button onclick="showAlert()">Show Alert</button>
+                <button onclick="setTitle()">Set Title</button>
+            </div>
+        </div>
+        
+        <!-- Storage -->
+        <div class="card">
+            <h2>💾 Storage</h2>
+            <div class="button-grid">
+                <button onclick="saveData()">Save Data</button>
+                <button onclick="loadData()">Load Data</button>
+                <button onclick="removeData()" class="danger">Remove Data</button>
+            </div>
+        </div>
+        
+        <!-- Analytics -->
+        <div class="card">
+            <h2>📊 Analytics (Fire & Forget)</h2>
+            <div class="button-grid">
+                <button onclick="trackEvent()">Track Event</button>
+                <button onclick="trackScreen()">Track Screen</button>
+            </div>
+        </div>
+        
+        <!-- Network & Settings -->
+        <div class="card">
+            <h2>🌐 Network Status</h2>
+            <div class="button-grid">
+                <button onclick="getNetworkStatus()" class="full-width">Get Network Status</button>
+            </div>
+        </div>
+        
+        <!-- Advanced -->
+        <div class="card">
+            <h2>⚙️ Advanced</h2>
+            <div class="button-grid">
+                <button class="full-width" onclick="runAllTests()">🧪 Run All Tests</button>
+            </div>
+        </div>
+        
+        <!-- Device Info Display -->
+        <div class="card" id="deviceInfoCard" style="display: none;">
+            <h2>Device Information</h2>
+            <div id="deviceInfo"></div>
+        </div>
+        
+        <!-- Output Log -->
+        <div class="card">
+            <h2>📋 Console Output</h2>
+            <div class="output" id="output">
+                <div class="output-line">Waiting for bridge...</div>
+            </div>
         </div>
     </div>
 
-    <!-- Load bridge -->
-    <script src="bridge.js"></script>
-    
     <script>
-        // Event log
-        const eventLog = [];
+        let debugEnabled = false;
         
-        function logEvent(message) {
-            const timestamp = new Date().toLocaleTimeString();
-            eventLog.unshift(`<span class="timestamp">[${timestamp}]</span> ${message}`);
-            if (eventLog.length > 20) eventLog.pop();
-            document.getElementById('eventLog').innerHTML = eventLog.join('<br>');
-        }
-        
-        function showOutput(elementId, content, isError = false) {
-            const output = document.getElementById(elementId);
-            output.style.display = 'block';
-            output.style.background = isError ? '#fee2e2' : '#f7f7f7';
-            output.style.color = isError ? '#991b1b' : '#333';
-            output.textContent = typeof content === 'object' 
-                ? JSON.stringify(content, null, 2) 
-                : content;
-        }
-        
-        // Initialize bridge
+        // Initialize bridge when ready
         async function init() {
-            console.log('Initializing bridge demo...');
+            log('Initializing app...');
             
-            // Check if bridge exists
             if (!window.bridge) {
-                document.getElementById('bridgeStatus').textContent = 'Not Available';
-                document.getElementById('bridgeStatus').className = 'status error';
-                console.error('Bridge not available!');
+                log('ERROR: Bridge not available! Running in browser?', 'error');
+                document.getElementById('statusText').textContent = 'Bridge not available';
                 return;
             }
             
-            // Wait for bridge to be ready
-            await window.bridge.ready();
+            log('Bridge found, waiting for ready state...');
             
-            // Update status
-            document.getElementById('bridgeStatus').textContent = 'Ready';
-            document.getElementById('bridgeStatus').className = 'status ready';
-            document.getElementById('bridgeVersion').textContent = window.bridge.version;
+            try {
+                await window.bridge.ready();
+                log('Bridge is ready!', 'success');
+                
+                document.getElementById('statusIndicator').classList.add('ready');
+                document.getElementById('statusText').textContent = 'Bridge Ready ✓';
+                
+                // Register handler for incoming messages from native
+                window.bridge.on(handleNativeMessage);
+                log('Registered native message handler', 'success');
+                
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Handle incoming messages from native
+        async function handleNativeMessage(message) {
+            const { action, content } = message.data;
+            log(`Received from native: ${action}`, 'success');
             
-            // Enable debug mode
-            window.bridge.setDebug(true);
-            
-            logEvent('Bridge initialized');
-            
-            // Get initial device info
+            switch (action) {
+                case 'nativeEvent':
+                    log(`Native event: ${content.message}`);
+                    return; // No response needed
+                    
+                case 'testEvent':
+                    log(`Test event received: ${content.message}`);
+                    return; // No response needed
+                    
+                case 'getWebState':
+                    // Return current web state
+                    return {
+                        scrollPosition: window.scrollY,
+                        url: window.location.href,
+                        timestamp: Date.now()
+                    };
+                    
+                default:
+                    log(`Unknown action from native: ${action}`, 'error');
+                    return { error: { code: 'UNKNOWN_ACTION', message: `Unknown action: ${action}` } };
+            }
+        }
+        
+        // Device & System Actions
+        async function getDeviceInfo() {
             try {
                 const info = await window.bridge.call({
                     data: { action: 'getDeviceInfo' }
                 });
-                document.getElementById('platform').textContent = 
-                    `${info.platform} ${info.osVersion} (${info.manufacturer} ${info.model})`;
-                logEvent(`Platform: ${info.platform} ${info.osVersion}`);
-            } catch (error) {
-                console.error('Error getting device info:', error);
-            }
-            
-            // Register handler for incoming messages from native
-            window.bridge.on(async (message) => {
-                const { action, content } = message.data;
-                logEvent(`<span class="event">Event:</span> ${action}`);
                 
-                switch (action) {
-                    case 'nativeEvent':
-                        console.log('Received native event:', content);
-                        logEvent(`Native says: ${content.message}`);
-                        return; // No response needed
-                        
-                    case 'getWebState':
-                        // Request-response: native wants data from web
-                        logEvent(`Native requested web state`);
-                        return {
-                            url: window.location.href,
-                            scrollY: window.scrollY,
-                            timestamp: Date.now()
-                        };
-                        
-                    case 'appStateChanged':
-                        logEvent(`App state: ${content.state}`);
-                        return;
-                        
-                    default:
-                        logEvent(`Unknown action: ${action}`);
-                        return { 
-                            error: { 
-                                code: 'UNKNOWN_ACTION', 
-                                message: `Unknown action: ${action}` 
-                            } 
-                        };
-                }
-            });
-            
-            logEvent('Message handler registered');
-        }
-        
-        // Device Info
-        async function getDeviceInfo() {
-            try {
-                logEvent('Requesting device info...');
-                const result = await window.bridge.call({
-                    data: { action: 'getDeviceInfo' }
-                });
-                showOutput('deviceInfoOutput', result);
-                logEvent('Device info received');
+                log('Device info received', 'success');
+                displayDeviceInfo(info);
             } catch (error) {
-                showOutput('deviceInfoOutput', `Error: ${error.message}`, true);
-                logEvent(`Error: ${error.message}`);
+                log(`ERROR: ${error.message}`, 'error');
             }
         }
         
-        // Toast Messages (Fire-and-Forget)
-        function showToast(message, duration) {
-            logEvent(`Showing toast: ${message}`);
-            window.bridge.call({
-                data: {
-                    action: 'showToast',
-                    content: { message, duration }
-                }
-            });
-            // Note: No await! This is fire-and-forget
-        }
-        
-        // Analytics (Fire-and-Forget)
-        function trackEvent(eventName, properties) {
-            logEvent(`Tracking: ${eventName}`);
-            window.bridge.call({
-                data: {
-                    action: 'trackEvent',
-                    content: { event: eventName, properties }
-                }
-            });
-            // Note: No await! This is fire-and-forget
-        }
-        
-        // Secure Storage
-        async function saveData() {
+        async function requestCamera() {
             try {
-                logEvent('Saving secure data...');
-                const result = await window.bridge.call({
-                    data: {
-                        action: 'setSecureData',
-                        content: {
-                            key: 'demo_key',
-                            value: 'secret_value_' + Date.now()
-                        }
-                    }
-                });
-                showOutput('storageOutput', 'Data saved successfully!');
-                logEvent('Data saved');
-            } catch (error) {
-                showOutput('storageOutput', `Error: ${error.message}`, true);
-            }
-        }
-        
-        async function loadData() {
-            try {
-                logEvent('Loading secure data...');
-                const result = await window.bridge.call({
-                    data: {
-                        action: 'getSecureData',
-                        content: { key: 'demo_key' }
-                    }
-                });
-                showOutput('storageOutput', result);
-                logEvent('Data loaded');
-            } catch (error) {
-                showOutput('storageOutput', `Error: ${error.message}`, true);
-            }
-        }
-        
-        // Permissions
-        async function requestPermission(permission) {
-            try {
-                logEvent(`Requesting ${permission} permission...`);
                 const result = await window.bridge.call({
                     data: {
                         action: 'requestPermission',
-                        content: { permission }
+                        content: { permission: 'camera' }
                     }
-                });
-                showOutput('permissionOutput', result);
-                logEvent(`Permission ${result.granted ? 'granted' : 'denied'}`);
+                }, { timeout: 10000 });
+                
+                log(`Camera permission: ${result.granted ? 'Granted ✓' : 'Denied ✗'}`, result.granted ? 'success' : 'error');
             } catch (error) {
-                showOutput('permissionOutput', `Error: ${error.message}`, true);
+                log(`ERROR: ${error.message}`, 'error');
             }
         }
         
-        // Network & Settings
-        async function getNetworkStatus() {
+        async function requestLocation() {
             try {
-                logEvent('Getting network status...');
                 const result = await window.bridge.call({
-                    data: { action: 'getNetworkStatus' }
-                });
-                showOutput('advancedOutput', result);
-                logEvent(`Network: ${result.online ? 'Online' : 'Offline'} (${result.type})`);
+                    data: {
+                        action: 'requestPermission',
+                        content: { permission: 'location' }
+                    }
+                }, { timeout: 10000 });
+                
+                log(`Location permission: ${result.granted ? 'Granted ✓' : 'Denied ✗'}`, result.granted ? 'success' : 'error');
             } catch (error) {
-                showOutput('advancedOutput', `Error: ${error.message}`, true);
+                log(`ERROR: ${error.message}`, 'error');
             }
         }
         
         async function openSettings() {
             try {
-                logEvent('Opening app settings...');
                 await window.bridge.call({
                     data: { action: 'openSettings' }
                 });
-                logEvent('Settings opened');
+                log('Opening settings...', 'success');
             } catch (error) {
-                showOutput('advancedOutput', `Error: ${error.message}`, true);
+                log(`ERROR: ${error.message}`, 'error');
             }
         }
         
-        // Advanced Features
-        async function testTimeout() {
+        async function copyText() {
             try {
-                logEvent('Testing timeout (this will fail)...');
-                const result = await window.bridge.call({
+                await window.bridge.call({
                     data: {
-                        action: 'slowOperation',
-                        content: {}
-                    }
-                }, { timeout: 5000 });
-                showOutput('advancedOutput', result);
-            } catch (error) {
-                showOutput('advancedOutput', `Expected timeout: ${error.message}`, false);
-                logEvent('Timeout handled correctly');
-            }
-        }
-        
-        async function testErrorHandling() {
-            try {
-                logEvent('Testing error handling...');
-                const result = await window.bridge.call({
-                    data: {
-                        action: 'unknownAction',
-                        content: {}
+                        action: 'copyToClipboard',
+                        content: { text: 'Hello from WebView Bridge!' }
                     }
                 });
-                showOutput('advancedOutput', result);
+                log('Text copied to clipboard ✓', 'success');
             } catch (error) {
-                showOutput('advancedOutput', `Expected error: ${error.message}`, false);
-                logEvent('Error handled correctly');
+                log(`ERROR: ${error.message}`, 'error');
             }
         }
         
-        let debugEnabled = true;
-        function toggleDebug() {
-            debugEnabled = !debugEnabled;
-            window.bridge.setDebug(debugEnabled);
-            showOutput('advancedOutput', `Debug mode: ${debugEnabled ? 'ON' : 'OFF'}`);
-            logEvent(`Debug mode: ${debugEnabled ? 'ON' : 'OFF'}`);
+        async function openUrl() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'openUrl',
+                        content: { 
+                            url: 'https://github.com',
+                            external: true
+                        }
+                    }
+                });
+                log('Opening URL...', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
         }
         
-        // Initialize on load
+        // UI Actions
+        async function showToast() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'showToast',
+                        content: {
+                            message: 'Hello from Bridge!',
+                            duration: 'short'
+                        }
+                    }
+                });
+                log('Toast shown ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function showAlert() {
+            try {
+                const result = await window.bridge.call({
+                    data: {
+                        action: 'showAlert',
+                        content: {
+                            title: 'Bridge Alert',
+                            message: 'This alert is shown from the native side!',
+                            buttons: [
+                                { title: 'OK', style: 'default' },
+                                { title: 'Cancel', style: 'cancel' }
+                            ]
+                        }
+                    }
+                });
+                log(`Alert result: ${result.button} clicked`, 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function setTitle() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'setTitle',
+                        content: { title: '🎉 New Title!' }
+                    }
+                });
+                log('Title updated ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Storage Actions
+        async function saveData() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'setSecureData',
+                        content: {
+                            key: 'testData',
+                            value: 'Hello Bridge! ' + Date.now()
+                        }
+                    }
+                });
+                log('Data saved ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadData() {
+            try {
+                const result = await window.bridge.call({
+                    data: {
+                        action: 'getSecureData',
+                        content: { key: 'testData' }
+                    }
+                });
+                
+                if (result.value) {
+                    log(`Data loaded: ${JSON.stringify(result.value)}`, 'success');
+                } else {
+                    log('No data found', 'error');
+                }
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function removeData() {
+            try {
+                await window.bridge.call({
+                    data: {
+                        action: 'removeSecureData',
+                        content: { key: 'testData' }
+                    }
+                });
+                log('Data removed ✓', 'success');
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Analytics Actions (Fire-and-forget - no await)
+        function trackEvent() {
+            window.bridge.call({
+                data: {
+                    action: 'trackEvent',
+                    content: {
+                        event: 'button_click',
+                        properties: {
+                            screen: 'home',
+                            timestamp: Date.now()
+                        }
+                    }
+                }
+            });
+            log('Event tracked (fire & forget)', 'success');
+        }
+        
+        function trackScreen() {
+            window.bridge.call({
+                data: {
+                    action: 'trackScreen',
+                    content: {
+                        screen: 'sample_screen',
+                        properties: {
+                            timestamp: Date.now()
+                        }
+                    }
+                }
+            });
+            log('Screen tracked (fire & forget)', 'success');
+        }
+        
+        // Network & Settings
+        async function getNetworkStatus() {
+            try {
+                const result = await window.bridge.call({
+                    data: { action: 'getNetworkStatus' }
+                });
+                
+                log(`Network: ${result.online ? 'Online ✓' : 'Offline ✗'} (${result.type})`, result.online ? 'success' : 'error');
+                displayDeviceInfo({ 'Network Status': result });
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test all features
+        async function runAllTests() {
+            log('🧪 Running all tests...', 'success');
+            
+            const tests = [
+                { name: 'Device Info', fn: getDeviceInfo },
+                { name: 'Copy Text', fn: copyText },
+                { name: 'Save Data', fn: saveData },
+                { name: 'Load Data', fn: loadData },
+                { name: 'Track Event', fn: trackEvent },
+                { name: 'Track Screen', fn: trackScreen },
+                { name: 'Network Status', fn: getNetworkStatus }
+            ];
+            
+            for (const test of tests) {
+                log(`Testing: ${test.name}...`);
+                try {
+                    await test.fn();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } catch (error) {
+                    log(`Test failed: ${test.name} - ${error.message}`, 'error');
+                }
+            }
+            
+            log('✅ All tests completed!', 'success');
+        }
+        
+        // Utility functions
+        function toggleDebug() {
+            debugEnabled = !debugEnabled;
+            window.bridge?.setDebug(debugEnabled);
+            log(`Debug mode: ${debugEnabled ? 'ON' : 'OFF'}`, 'success');
+        }
+        
+        function displayDeviceInfo(info) {
+            const card = document.getElementById('deviceInfoCard');
+            const container = document.getElementById('deviceInfo');
+            
+            container.innerHTML = Object.entries(info)
+                .map(([key, value]) => {
+                    const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                    return `
+                        <div class="info-row">
+                            <span class="info-label">${key}</span>
+                            <span class="info-value">${displayValue}</span>
+                        </div>
+                    `;
+                })
+                .join('');
+            
+            card.style.display = 'block';
+        }
+        
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${message}`;
+            
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+            
+            console.log(`[Bridge Sample] ${message}`);
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+            log('Console cleared');
+        }
+        
+        // Initialize on page load
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
             init();
         }
     </script>
+    
+    <!-- Load bridge.js for Android -->
+    <script src="bridge.js"></script>
 </body>
 </html>
-

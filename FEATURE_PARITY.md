@@ -6,6 +6,14 @@ This document summarizes the feature parity between iOS and Android bridge imple
 
 Both iOS and Android sample apps now have **identical feature sets** in both their native bridge implementations and their web UI demonstrations.
 
+### 🎯 Key Achievement: Identical Web Code
+
+**The `index.html` files are now 100% identical on both platforms!** This demonstrates the core value proposition of the JavaScript bridge:
+
+✨ **Write once, run everywhere** - The exact same HTML/JavaScript code works identically on both iOS and Android, with the bridge automatically detecting the platform and routing calls appropriately.
+
+The only difference is that Android loads an external `bridge.js` file while iOS injects the bridge at runtime - but from the web developer's perspective, the API is completely identical.
+
 ---
 
 ## 🔌 Bridge Actions (Native Side)
@@ -118,12 +126,47 @@ Both platforms support:
 - **Version**: 1.0.0 (same on both platforms)
 - **API**: Identical JavaScript API on both platforms
 - **Pattern**: Promise-based with async/await support
+- **Auto-Detection**: Automatically detects iOS (webkit) vs Android (AndroidBridge)
 - **Features**: 
   - Timeout support
   - AbortSignal support
   - Debug logging
   - Message queuing
   - Error handling
+
+### Bridge Usage (Identical on Both Platforms)
+
+```javascript
+// This exact code works on both iOS and Android!
+
+// Wait for bridge to be ready
+await window.bridge.ready();
+
+// Call native with request-response
+const result = await window.bridge.call({
+    data: {
+        action: 'getDeviceInfo'
+    }
+});
+
+// Fire-and-forget (no await)
+window.bridge.call({
+    data: {
+        action: 'trackEvent',
+        content: { event: 'button_click' }
+    }
+});
+
+// Handle messages from native
+window.bridge.on(async (message) => {
+    const { action, content } = message.data;
+    if (action === 'nativeEvent') {
+        console.log('Received:', content.message);
+    }
+});
+```
+
+**No platform-specific code needed!** The bridge automatically handles platform differences internally.
 
 ---
 

@@ -12,7 +12,7 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
@@ -191,8 +191,10 @@
             <div class="button-grid">
                 <button onclick="getDeviceInfo()">Device Info</button>
                 <button onclick="requestCamera()">Camera Permission</button>
+                <button onclick="requestLocation()">Location Permission</button>
                 <button onclick="openSettings()">Open Settings</button>
                 <button onclick="copyText()">Copy to Clipboard</button>
+                <button onclick="openUrl()">Open URL</button>
             </div>
         </div>
         
@@ -203,7 +205,6 @@
                 <button onclick="showToast()" class="success">Show Toast</button>
                 <button onclick="showAlert()">Show Alert</button>
                 <button onclick="setTitle()">Set Title</button>
-                <button onclick="openUrl()">Open URL</button>
             </div>
         </div>
         
@@ -228,10 +229,9 @@
         
         <!-- Network & Settings -->
         <div class="card">
-            <h2>🌐 Network & Settings</h2>
+            <h2>🌐 Network Status</h2>
             <div class="button-grid">
-                <button onclick="getNetworkStatus()">Network Status</button>
-                <button onclick="requestLocation()">Location Permission</button>
+                <button onclick="getNetworkStatus()" class="full-width">Get Network Status</button>
             </div>
         </div>
         
@@ -464,7 +464,7 @@
                         action: 'setSecureData',
                         content: {
                             key: 'testData',
-                            value: { message: 'Hello Bridge!', timestamp: Date.now() }
+                            value: 'Hello Bridge! ' + Date.now()
                         }
                     }
                 });
@@ -634,4 +634,3 @@
     </script>
 </body>
 </html>
-
