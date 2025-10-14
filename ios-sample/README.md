@@ -45,13 +45,117 @@ cd ios-sample
 open BridgeSample.xcodeproj
 ```
 
-### 2. Build and Run
+### 2. Build and Run (Xcode GUI)
 
 1. Select a simulator or device from the scheme selector
 2. Press `Cmd + R` to build and run
 3. The app will launch with a WebView showing the bridge demo
 
-### 3. Try the Features
+### 3. Build and Run (Command Line)
+
+Alternatively, you can build and run from the command line:
+
+#### Step 1: List Available Simulators
+
+```bash
+xcrun simctl list devices available | grep -E "iPhone|iPad"
+```
+
+This will show all available simulators, for example:
+```
+iPhone 16 Pro Max (96A52C46-65B2-4706-8997-38C45AC9623A) (Shutdown)
+iPhone 17 Pro Max (6E61BF3A-F907-4617-898B-1CA4C8EAD012) (Shutdown)
+```
+
+#### Step 2: Build the Project
+
+```bash
+cd ios-sample
+xcodebuild -project BridgeSample.xcodeproj \
+  -scheme BridgeSample \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' \
+  clean build
+```
+
+Replace `iPhone 17 Pro Max` with your desired simulator name from Step 1.
+
+#### Step 3: Boot the Simulator
+
+```bash
+xcrun simctl boot "iPhone 17 Pro Max"
+```
+
+Note: If the simulator is already running, this command will return an error but you can ignore it.
+
+#### Step 4: Install the App
+
+```bash
+xcrun simctl install "iPhone 17 Pro Max" \
+  ~/Library/Developer/Xcode/DerivedData/BridgeSample-*/Build/Products/Debug-iphonesimulator/BridgeSample.app
+```
+
+Or with the exact path:
+```bash
+# Find the exact path first
+find ~/Library/Developer/Xcode/DerivedData -name "BridgeSample.app" -path "*/Debug-iphonesimulator/*" 2>/dev/null
+
+# Then install using that path
+xcrun simctl install "iPhone 17 Pro Max" /path/to/BridgeSample.app
+```
+
+#### Step 5: Launch the App
+
+```bash
+xcrun simctl launch "iPhone 17 Pro Max" com.example.bridgesample
+```
+
+#### Step 6: Open Simulator UI (Optional)
+
+If the Simulator window is not visible:
+
+```bash
+open -a Simulator
+```
+
+#### All-in-One Script
+
+You can combine all steps into a single script:
+
+```bash
+#!/bin/bash
+
+SIMULATOR_NAME="iPhone 17 Pro Max"
+BUNDLE_ID="com.example.bridgesample"
+PROJECT_DIR="ios-sample"
+
+# Build
+echo "Building project..."
+cd "$PROJECT_DIR"
+xcodebuild -project BridgeSample.xcodeproj \
+  -scheme BridgeSample \
+  -destination "platform=iOS Simulator,name=$SIMULATOR_NAME" \
+  clean build
+
+# Boot simulator
+echo "Booting simulator..."
+xcrun simctl boot "$SIMULATOR_NAME" 2>/dev/null || true
+
+# Find and install app
+echo "Installing app..."
+APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "BridgeSample.app" -path "*/Debug-iphonesimulator/*" 2>/dev/null | head -1)
+xcrun simctl install "$SIMULATOR_NAME" "$APP_PATH"
+
+# Launch app
+echo "Launching app..."
+xcrun simctl launch "$SIMULATOR_NAME" "$BUNDLE_ID"
+
+# Open simulator UI
+open -a Simulator
+
+echo "✅ App is now running!"
+```
+
+### 4. Try the Features
 
 The sample HTML page includes interactive demos for:
 
@@ -62,7 +166,7 @@ The sample HTML page includes interactive demos for:
 
 ## Architecture
 
-### 1. Bridge JavaScript (WebViewBridge.swift)
+### Bridge JavaScript (WebViewBridge.swift)
 
 The bridge JavaScript is injected into the WebView at document start. It provides:
 
@@ -81,7 +185,7 @@ window.bridge.isReady
 window.bridge.setDebug(true)
 ```
 
-### 2. Native Message Handler (BridgeViewController.swift)
+### Native Message Handler (BridgeViewController.swift)
 
 The view controller:
 - Sets up WKWebView with bridge injection
@@ -89,7 +193,7 @@ The view controller:
 - Dispatches actions to `BridgeActionHandler`
 - Sends responses back to JavaScript
 
-### 3. Action Handler (BridgeActions.swift)
+### Action Handler (BridgeActions.swift)
 
 Implements all native actions:
 
@@ -105,7 +209,7 @@ Actions include:
 - `setSecureData(key, value)` - Storage (UserDefaults)
 - `trackEvent(name, properties)` - Analytics (console log)
 
-### 4. SwiftUI Integration (ContentView.swift)
+### SwiftUI Integration (ContentView.swift)
 
 SwiftUI wrapper around UIKit `WKWebView`:
 
@@ -152,7 +256,7 @@ let result = try await bridgeController.callWeb(
 
 ## Key Implementation Details
 
-### 1. Thread Safety
+### Thread Safety
 
 All WebView operations run on the main thread:
 
@@ -162,7 +266,7 @@ DispatchQueue.main.async {
 }
 ```
 
-### 2. JSON Serialization
+### JSON Serialization
 
 Proper JSON handling for native → web communication:
 
@@ -175,7 +279,7 @@ guard let jsonData = try? JSONSerialization.data(withJSONObject: message),
 let js = "window.bridge._onNativeMessage(\(jsonString))"
 ```
 
-### 3. Error Handling
+### Error Handling
 
 Structured errors with codes:
 
@@ -190,7 +294,7 @@ enum BridgeError: LocalizedError {
 }
 ```
 
-### 4. Request-Response Tracking
+### Request-Response Tracking
 
 Pending requests tracked with continuations:
 
@@ -240,11 +344,11 @@ const result = await window.bridge.call({
 
 ## Testing
 
-### 1. Run All Tests Button
+### Run All Tests Button
 
 The HTML page includes a "Run All Tests" button that executes multiple actions in sequence.
 
-### 2. Debug Mode
+### Debug Mode
 
 Toggle debug mode from:
 - The menu (three dots) in the navigation bar
@@ -252,7 +356,7 @@ Toggle debug mode from:
 
 Debug mode logs all bridge operations to the console.
 
-### 3. Manual Testing
+### Manual Testing
 
 Use the iOS Simulator to test:
 - Different device types (iPhone, iPad)

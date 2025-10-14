@@ -125,22 +125,30 @@ class BridgeActionHandler {
     // MARK: - Device & System Actions
     
     private func getDeviceInfo() async throws -> [String: Any] {
-        let device = UIDevice.current
-        
-        return [
-            "platform": "iOS",
-            "osVersion": device.systemVersion,
-            "model": device.model,
-            "name": device.name,
-            "identifierForVendor": device.identifierForVendor?.uuidString ?? "",
-            "systemName": device.systemName,
-            "isSimulator": TARGET_OS_SIMULATOR == 1,
-            "screenScale": await UIScreen.main.scale,
-            "screenSize": [
-                "width": await UIScreen.main.bounds.width,
-                "height": await UIScreen.main.bounds.height
+        return await MainActor.run {
+            let device = UIDevice.current
+            
+            #if targetEnvironment(simulator)
+            let isSimulator = true
+            #else
+            let isSimulator = false
+            #endif
+            
+            return [
+                "platform": "iOS",
+                "osVersion": device.systemVersion,
+                "model": device.model,
+                "name": device.name,
+                "identifierForVendor": device.identifierForVendor?.uuidString ?? "",
+                "systemName": device.systemName,
+                "isSimulator": isSimulator,
+                "screenScale": UIScreen.main.scale,
+                "screenSize": [
+                    "width": UIScreen.main.bounds.width,
+                    "height": UIScreen.main.bounds.height
+                ]
             ]
-        ]
+        }
     }
     
     private func requestPermission(type: String) async throws -> [String: Any] {
@@ -190,7 +198,7 @@ class BridgeActionHandler {
     }
     
     private func copyToClipboard(text: String) async throws -> [String: Bool] {
-        await UIPasteboard.general.string = text
+        UIPasteboard.general.string = text
         return ["success": true]
     }
     
