@@ -13,6 +13,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-sample 
 
     steps:
       - uses: actions/checkout@v4
@@ -28,5 +31,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        working-directory: android-sample
         run: ./gradlew build
