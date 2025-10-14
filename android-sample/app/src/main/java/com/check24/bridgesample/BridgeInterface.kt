@@ -8,7 +8,13 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.json.JSONObject
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.Continuation
@@ -17,7 +23,7 @@ import kotlin.coroutines.resumeWithException
 
 /**
  * Bridge interface between WebView JavaScript and Android native code.
- * Implements the JavaScript Bridge Specification.
+ * Implements the JavaScript Bridge Specification using Kotlin Serialization.
  * 
  * IMPORTANT: Methods annotated with @JavascriptInterface run on a background thread.
  * All WebView operations MUST be posted to the main thread.
@@ -28,6 +34,12 @@ class BridgeInterface(private val webView: WebView) {
     private val pendingRequests = ConcurrentHashMap<String, PendingRequest>()
     private var debugEnabled = false
     
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        encodeDefaults = true
+    }
+    
     companion object {
         private const val TAG = "BridgeInterface"
     }
@@ -36,7 +48,7 @@ class BridgeInterface(private val webView: WebView) {
      * Internal data class to track pending requests with timeout handling
      */
     private data class PendingRequest(
-        val continuation: Continuation<JSONObject>,
+        val continuation: Continuation<JsonElement>,
         val timeoutRunnable: Runnable
     )
     
@@ -57,21 +69,28 @@ class BridgeInterface(private val webView: WebView) {
                 Log.d(TAG, "Received from web: $jsonString")
             }
             
-            val message = JSONObject(jsonString)
+            // Parse to JsonElement first to determine message type
+            val jsonElement = json.parseToJsonElement(jsonString)
+            
+            if (jsonElement !is JsonObject) {
+                Log.e(TAG, "Message is not a JSON object")
+                return
+            }
             
             // Check if this is a response to native's callWeb request
             // Responses have 'id' and 'result' or 'error', but no 'data'
-            if (message.has("id") && !message.has("data")) {
+            if (jsonElement.containsKey("id") && !jsonElement.containsKey("data")) {
                 // This is a response to our callWeb request
-                handleWebResponse(jsonString)
+                val response = json.decodeFromString<BridgeResponse>(jsonString)
+                handleWebResponse(response)
                 return
             }
             
             // Regular message with action
-            val data = message.getJSONObject("data")
-            val action = data.getString("action")
-            val content = data.optJSONObject("content")
-            val id = if (message.has("id")) message.getString("id") else null
+            val message = json.decodeFromString<BridgeMessage>(jsonString)
+            val action = message.data.action
+            val content = message.data.content
+            val id = message.id
             
             // Handle on main thread
             mainHandler.post {
@@ -82,12 +101,14 @@ class BridgeInterface(private val webView: WebView) {
             Log.e(TAG, "Error handling message from web", e)
             // Try to send error back if we can parse the ID
             try {
-                val message = JSONObject(jsonString)
-                if (message.has("id") && message.has("data")) {
-                    val id = message.getString("id")
-                    // Must post to main thread for evaluateJavascript
-                    mainHandler.post {
-                        sendError(id, "PARSE_ERROR", "Failed to parse message: ${e.message}")
+                val jsonElement = json.parseToJsonElement(jsonString)
+                if (jsonElement is JsonObject && jsonElement.containsKey("id") && jsonElement.containsKey("data")) {
+                    val id = jsonElement["id"]?.toString()?.removeSurrounding("\"")
+                    if (id != null) {
+                        // Must post to main thread for evaluateJavascript
+                        mainHandler.post {
+                            sendError(id, "PARSE_ERROR", "Failed to parse message: ${e.message}")
+                        }
                     }
                 }
             } catch (parseError: Exception) {
@@ -99,7 +120,7 @@ class BridgeInterface(private val webView: WebView) {
     /**
      * Handle incoming actions from web
      */
-    private fun handleAction(action: String, content: JSONObject?, id: String?) {
+    private fun handleAction(action: String, content: JsonElement?, id: String?) {
         if (debugEnabled) {
             Log.d(TAG, "Handling action: $action, hasId: ${id != null}")
         }
@@ -107,7 +128,7 @@ class BridgeInterface(private val webView: WebView) {
         try {
             when (action) {
                 "getDeviceInfo" -> {
-                    val result = JSONObject().apply {
+                    val result = buildJsonObject {
                         put("platform", "Android")
                         put("osVersion", Build.VERSION.RELEASE)
                         put("sdkInt", Build.VERSION.SDK_INT)
@@ -121,15 +142,17 @@ class BridgeInterface(private val webView: WebView) {
                 }
                 
                 "showToast" -> {
-                    val message = content?.optString("message") ?: "Hello from native!"
-                    val duration = when (content?.optString("duration")) {
+                    val contentObj = content as? JsonObject
+                    val message = contentObj?.get("message")?.toString()?.removeSurrounding("\"") ?: "Hello from native!"
+                    val durationStr = contentObj?.get("duration")?.toString()?.removeSurrounding("\"")
+                    val duration = when (durationStr) {
                         "long" -> Toast.LENGTH_LONG
                         else -> Toast.LENGTH_SHORT
                     }
                     Toast.makeText(webView.context, message, duration).show()
                     
                     if (id != null) {
-                        sendResult(id, JSONObject().apply {
+                        sendResult(id, buildJsonObject {
                             put("success", true)
                         })
                     }
@@ -137,8 +160,9 @@ class BridgeInterface(private val webView: WebView) {
                 
                 "trackEvent" -> {
                     // Fire-and-forget analytics event
-                    val eventName = content?.optString("event") ?: "unknown"
-                    val properties = content?.optJSONObject("properties")
+                    val contentObj = content as? JsonObject
+                    val eventName = contentObj?.get("event")?.toString()?.removeSurrounding("\"") ?: "unknown"
+                    val properties = contentObj?.get("properties")
                     Log.i(TAG, "Track event: $eventName, properties: $properties")
                     
                     // In a real app, send to analytics service here
@@ -146,13 +170,14 @@ class BridgeInterface(private val webView: WebView) {
                 }
                 
                 "requestPermission" -> {
-                    val permission = content?.optString("permission") ?: "unknown"
+                    val contentObj = content as? JsonObject
+                    val permission = contentObj?.get("permission")?.toString()?.removeSurrounding("\"") ?: "unknown"
                     Log.i(TAG, "Permission requested: $permission")
                     
                     // In a real app, check and request actual permissions
                     // For demo, we'll just return granted
                     if (id != null) {
-                        sendResult(id, JSONObject().apply {
+                        sendResult(id, buildJsonObject {
                             put("granted", true)
                             put("permission", permission)
                         })
@@ -160,26 +185,28 @@ class BridgeInterface(private val webView: WebView) {
                 }
                 
                 "navigate" -> {
-                    val url = content?.optString("url")
+                    val contentObj = content as? JsonObject
+                    val url = contentObj?.get("url")?.toString()?.removeSurrounding("\"")
                     Log.i(TAG, "Navigate to: $url")
                     
                     // In a real app, handle navigation
                     if (id != null) {
-                        sendResult(id, JSONObject().apply {
+                        sendResult(id, buildJsonObject {
                             put("success", true)
-                            put("url", url)
+                            put("url", url ?: "")
                         })
                     }
                 }
                 
                 "getSecureData" -> {
-                    val key = content?.optString("key") ?: ""
+                    val contentObj = content as? JsonObject
+                    val key = contentObj?.get("key")?.toString()?.removeSurrounding("\"") ?: ""
                     Log.i(TAG, "Get secure data: $key")
                     
                     // In a real app, retrieve from secure storage (KeyStore, etc.)
                     // For demo, return mock data
                     if (id != null) {
-                        sendResult(id, JSONObject().apply {
+                        sendResult(id, buildJsonObject {
                             put("value", "mock_secure_value_for_$key")
                             put("found", true)
                         })
@@ -187,13 +214,14 @@ class BridgeInterface(private val webView: WebView) {
                 }
                 
                 "setSecureData" -> {
-                    val key = content?.optString("key") ?: ""
-                    val value = content?.optString("value") ?: ""
+                    val contentObj = content as? JsonObject
+                    val key = contentObj?.get("key")?.toString()?.removeSurrounding("\"") ?: ""
+                    val value = contentObj?.get("value")?.toString()?.removeSurrounding("\"") ?: ""
                     Log.i(TAG, "Set secure data: $key = $value")
                     
                     // In a real app, store in secure storage
                     if (id != null) {
-                        sendResult(id, JSONObject().apply {
+                        sendResult(id, buildJsonObject {
                             put("success", true)
                         })
                     }
@@ -220,18 +248,20 @@ class BridgeInterface(private val webView: WebView) {
      * Send successful result back to web
      * MUST be called from main thread
      */
-    private fun sendResult(id: String, result: JSONObject) {
+    private fun sendResult(id: String, result: JsonElement) {
         try {
-            val response = JSONObject().apply {
-                put("id", id)
-                put("result", result)
-            }
+            val response = BridgeResponse(
+                id = id,
+                result = result
+            )
+            
+            val responseJson = json.encodeToString(response)
             
             if (debugEnabled) {
-                Log.d(TAG, "Sending result: $response")
+                Log.d(TAG, "Sending result: $responseJson")
             }
             
-            val js = "window.bridge._onNativeResponse($response)"
+            val js = "window.bridge._onNativeResponse($responseJson)"
             webView.evaluateJavascript(js, null)
             
         } catch (e: Exception) {
@@ -245,19 +275,18 @@ class BridgeInterface(private val webView: WebView) {
      */
     private fun sendError(id: String, code: String, message: String) {
         try {
-            val response = JSONObject().apply {
-                put("id", id)
-                put("error", JSONObject().apply {
-                    put("code", code)
-                    put("message", message)
-                })
-            }
+            val response = BridgeResponse(
+                id = id,
+                error = BridgeError(code = code, message = message)
+            )
+            
+            val responseJson = json.encodeToString(response)
             
             if (debugEnabled) {
-                Log.d(TAG, "Sending error: $response")
+                Log.d(TAG, "Sending error: $responseJson")
             }
             
-            val js = "window.bridge._onNativeResponse($response)"
+            val js = "window.bridge._onNativeResponse($responseJson)"
             webView.evaluateJavascript(js, null)
             
         } catch (e: Exception) {
@@ -272,18 +301,31 @@ class BridgeInterface(private val webView: WebView) {
     fun sendEventToWeb(action: String, content: Map<String, Any>) {
         mainHandler.post {
             try {
-                val message = JSONObject().apply {
-                    put("data", JSONObject().apply {
-                        put("action", action)
-                        put("content", JSONObject(content))
-                    })
+                val contentJson = buildJsonObject {
+                    content.forEach { (key, value) ->
+                        when (value) {
+                            is String -> put(key, value)
+                            is Number -> put(key, JsonPrimitive(value))
+                            is Boolean -> put(key, value)
+                            else -> put(key, value.toString())
+                        }
+                    }
                 }
+                
+                val message = EventMessage(
+                    data = MessageData(
+                        action = action,
+                        content = contentJson
+                    )
+                )
+                
+                val messageJson = json.encodeToString(message)
                 
                 if (debugEnabled) {
-                    Log.d(TAG, "Sending event to web: $message")
+                    Log.d(TAG, "Sending event to web: $messageJson")
                 }
                 
-                val js = "window.bridge._onNativeMessage($message)"
+                val js = "window.bridge._onNativeMessage($messageJson)"
                 webView.evaluateJavascript(js, null)
                 
             } catch (e: Exception) {
@@ -296,7 +338,7 @@ class BridgeInterface(private val webView: WebView) {
      * Call web and await response (request-response pattern)
      * Uses Kotlin coroutines for async operation
      */
-    suspend fun callWeb(action: String, content: Map<String, Any>): JSONObject = 
+    suspend fun callWeb(action: String, content: Map<String, Any>): JsonElement = 
         suspendCancellableCoroutine { continuation ->
             val id = UUID.randomUUID().toString()
             
@@ -323,22 +365,35 @@ class BridgeInterface(private val webView: WebView) {
             
             mainHandler.post {
                 try {
-                    val message = JSONObject().apply {
-                        put("data", JSONObject().apply {
-                            put("action", action)
-                            put("content", JSONObject(content))
-                        })
-                        put("id", id)
+                    val contentJson = buildJsonObject {
+                        content.forEach { (key, value) ->
+                            when (value) {
+                                is String -> put(key, value)
+                                is Number -> put(key, JsonPrimitive(value))
+                                is Boolean -> put(key, value)
+                                else -> put(key, value.toString())
+                            }
+                        }
                     }
                     
+                    val message = BridgeMessage(
+                        data = MessageData(
+                            action = action,
+                            content = contentJson
+                        ),
+                        id = id
+                    )
+                    
+                    val messageJson = json.encodeToString(message)
+                    
                     if (debugEnabled) {
-                        Log.d(TAG, "Calling web: $message")
+                        Log.d(TAG, "Calling web: $messageJson")
                     }
                     
                     // Setup timeout (30 seconds)
                     mainHandler.postDelayed(timeoutRunnable, 30000)
                     
-                    val js = "window.bridge._onNativeMessage($message)"
+                    val js = "window.bridge._onNativeMessage($messageJson)"
                     webView.evaluateJavascript(js, null)
                     
                 } catch (e: Exception) {
@@ -355,28 +410,24 @@ class BridgeInterface(private val webView: WebView) {
      * Handle response from web (called internally by the web bridge)
      * This is called when web responds to a native callWeb request
      */
-    private fun handleWebResponse(responseJson: String) {
+    private fun handleWebResponse(response: BridgeResponse) {
         try {
-            val response = JSONObject(responseJson)
-            val id = response.getString("id")
-            val pending = pendingRequests.remove(id)
+            val pending = pendingRequests.remove(response.id)
             
             if (pending != null) {
                 // Cancel the timeout
                 mainHandler.removeCallbacks(pending.timeoutRunnable)
                 
                 // Resume the continuation with result or error
-                if (response.has("error")) {
-                    val error = response.getJSONObject("error")
+                if (response.error != null) {
                     pending.continuation.resumeWithException(
-                        Exception(error.optString("message", "Unknown error"))
+                        Exception(response.error.message)
                     )
                 } else {
-                    val result = response.optJSONObject("result") ?: JSONObject()
-                    pending.continuation.resume(result)
+                    pending.continuation.resume(response.result ?: buildJsonObject {})
                 }
             } else {
-                Log.w(TAG, "Received response for unknown request ID: $id")
+                Log.w(TAG, "Received response for unknown request ID: ${response.id}")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error handling web response", e)
@@ -391,4 +442,3 @@ class BridgeInterface(private val webView: WebView) {
         Log.i(TAG, "Debug mode: $enabled")
     }
 }
-

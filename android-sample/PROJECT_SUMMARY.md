@@ -93,11 +93,11 @@ A complete, production-ready Android sample app implementing the JavaScript Brid
 
 ## 📊 Project Statistics
 
-- **Files Created**: 25+
-- **Lines of Code**: 1,500+
-- **Kotlin Files**: 2 (MainActivity, BridgeInterface)
+- **Files Created**: 27+
+- **Lines of Code**: 1,700+
+- **Kotlin Files**: 3 (MainActivity, BridgeInterface, BridgeMessages)
 - **JavaScript Files**: 2 (bridge.js, demo in HTML)
-- **Documentation**: 4 markdown files
+- **Documentation**: 6 markdown files
 - **Configuration**: 8 files
 
 ## 🎨 UI Features
@@ -124,8 +124,10 @@ Correct serialization for Android (`JSON.stringify()` on web side).
 Proper cleanup of pending requests on timeout and cancellation.
 
 ### Modern Kotlin ✅
+- Kotlin 2.1.0 with K2 compiler
+- Kotlin Serialization for type-safe JSON
 - Coroutines for async operations
-- Sealed patterns for type safety
+- Data classes and sealed types
 - Extension functions
 - DSL-style builders
 
@@ -137,11 +139,13 @@ Proper cleanup of pending requests on timeout and cancellation.
 
 ## 📱 Compatibility
 
-- **Minimum SDK**: API 24 (Android 7.0)
-- **Target SDK**: API 34 (Android 14)
-- **Kotlin**: 1.9.20
-- **Gradle**: 8.2
-- **Android Studio**: Arctic Fox or later
+- **Minimum SDK**: API 23 (Android 6.0) - 99.8% coverage
+- **Target SDK**: API 35 (Android 15)
+- **Compile SDK**: API 35 (Android 15)
+- **Kotlin**: 2.1.0 (K2 compiler)
+- **Gradle**: 8.11.1
+- **Android Studio**: Ladybug or later (2024.2.1+)
+- **Kotlin Serialization**: 1.7.3
 
 ## 🚀 How to Use
 
