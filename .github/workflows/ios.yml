@@ -27,13 +27,6 @@ jobs:
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           xcodebuild -version
 
-      - name: Install dependencies
-        run: |
-          if [ -f "Podfile" ]; then
-            sudo gem install cocoapods
-            pod install --repo-update
-          fi
-
       - name: Build iOS app
         run: |
           xcodebuild \
