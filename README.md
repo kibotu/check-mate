@@ -1,4 +1,4 @@
-# Check-Mate: JavaScript Bridge Sample Apps
+# Check-Mate: JavaScript Bridge Sample Apps [![Android CI](https://github.com/kibotu/check-mate/actions/workflows/android.yml/badge.svg)](https://github.com/kibotu/check-mate/actions/workflows/android.yml) [![iOS CI](https://github.com/kibotu/check-mate/actions/workflows/ios.yml/badge.svg)](https://github.com/kibotu/check-mate/actions/workflows/ios.yml)
 
 A cross-platform JavaScript bridge implementation demonstrating **write-once, run-everywhere** web development for iOS and Android mobile apps.
 
