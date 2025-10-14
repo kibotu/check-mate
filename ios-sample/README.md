@@ -2,7 +2,7 @@
 
 A complete iOS sample app demonstrating the JavaScript Bridge specification for bidirectional communication between native iOS and WebView.
 
-## Overview 
+## Overview
 
 This sample app implements the complete bridge specification with:
 
