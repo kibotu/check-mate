@@ -71,7 +71,8 @@ iPhone 17 Pro Max (6E61BF3A-F907-4617-898B-1CA4C8EAD012) (Shutdown)
 
 ```bash
 cd ios-sample
-xcodebuild -project BridgeSample.xcodeproj \
+xcodebuild \ 
+  -project BridgeSample.xcodeproj \
   -scheme BridgeSample \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' \
   clean build
