@@ -148,6 +148,7 @@ struct BridgeJavaScript {
         // If message has id, send error back
         if (message.id) {
           const response = {
+            version: '1.0',
             id: message.id,
             error: { code: 'NO_HANDLER', message: 'No message handler registered' }
           };
@@ -164,7 +165,7 @@ struct BridgeJavaScript {
         
         // If message has id, send response back
         if (message.id) {
-          const response = { id: message.id, result: result !== undefined ? result : null };
+          const response = { version: '1.0', id: message.id, result: result !== undefined ? result : null };
           log('Sending response to native:', response);
           
           if (window.webkit?.messageHandlers?.bridge) {
@@ -177,6 +178,7 @@ struct BridgeJavaScript {
         // Send error back if message expects response
         if (message.id) {
           const response = {
+            version: '1.0',
             id: message.id,
             error: { code: 'JS_ERROR', message: error.message || String(error) }
           };

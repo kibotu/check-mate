@@ -44,8 +44,8 @@
       const { timeout = 30000, signal } = options;
       const id = Math.random().toString(36).substr(2, 9);
       
-      // Add id to message for request-response pattern
-      const messageWithId = { ...message, id };
+      // Add version and id to message for request-response pattern
+      const messageWithId = { version: '1.0', ...message, id };
       
       log('Calling native:', messageWithId);
       
@@ -165,7 +165,7 @@
         
         // If message has id, send response back
         if (message.id && result !== undefined) {
-          const response = { id: message.id, result };
+          const response = { version: '1.0', id: message.id, result };
           log('Sending response back to native:', response);
           
           if (window.AndroidBridge) {
@@ -180,6 +180,7 @@
         // Send error back if message expects response
         if (message.id) {
           const response = {
+            version: '1.0',
             id: message.id,
             error: { 
               code: 'JS_ERROR', 

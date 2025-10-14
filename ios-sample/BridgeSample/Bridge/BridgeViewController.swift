@@ -136,6 +136,7 @@ class BridgeViewController: UIViewController, ObservableObject {
     /// Send a fire-and-forget event to the web side
     func sendEventToWeb(action: String, content: [String: Any]) {
         let message: [String: Any] = [
+            "version": "1.0",
             "data": [
                 "action": action,
                 "content": content
@@ -166,6 +167,7 @@ class BridgeViewController: UIViewController, ObservableObject {
     func callWeb(action: String, content: [String: Any]) async throws -> Any? {
         let id = UUID().uuidString
         let message: [String: Any] = [
+            "version": "1.0",
             "data": [
                 "action": action,
                 "content": content
@@ -231,6 +233,7 @@ class BridgeViewController: UIViewController, ObservableObject {
     
     private func sendResult(id: String, result: Any?) {
         let response: [String: Any] = [
+            "version": "1.0",
             "id": id,
             "result": result ?? NSNull()
         ]
@@ -255,6 +258,7 @@ class BridgeViewController: UIViewController, ObservableObject {
     
     private func sendError(id: String, error: BridgeError) {
         let response: [String: Any] = [
+            "version": "1.0",
             "id": id,
             "error": [
                 "code": error.code,

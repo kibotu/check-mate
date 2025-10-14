@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class BridgeMessage(
+    val version: String = "1.0",
     val data: MessageData,
     val id: String? = null
 )
@@ -22,6 +23,7 @@ data class MessageData(
 
 @Serializable
 data class BridgeResponse(
+    val version: String = "1.0",
     val id: String,
     val result: JsonElement? = null,
     val error: BridgeError? = null
@@ -35,6 +37,7 @@ data class BridgeError(
 
 @Serializable
 data class EventMessage(
+    val version: String = "1.0",
     val data: MessageData
 )
 
