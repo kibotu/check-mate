@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import timber.log.Timber
 
-class BridgeSampleApp : Application() {
+class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
