@@ -952,7 +952,7 @@ initBridge().then(deviceInfo => {
 
 ## Additional Resources
 
-- **Live Demo:** Check `pluginapi/src/debug/assets/c24/index.html` for a complete interactive demo with all bridge features
+- **Live Demo:** Check `android-sample/app/src/main/assets/index.html` for a complete interactive demo with all bridge features
 - **Native Implementation:** See `JavaScriptBridge.kt` for the Android/iOS bridge implementation details
 
 ---

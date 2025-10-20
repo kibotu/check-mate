@@ -541,7 +541,7 @@ bridge.call({
 class TrackEventCommand : BridgeCommand {
     override suspend fun handle(content: Any?): JSONObject? {
         // Track event asynchronously
-        C24Tracker.trackEvent(...)
+        Tracker.trackEvent(...)
         
         // Return null = no response sent to web
         return null
@@ -2931,8 +2931,8 @@ dashboard.init();
 
 ## References
 
-- **Android Implementation**: `pluginapi/src/main/java/de/check24/profis/partner/pluginapi/features/webview/bridge/JavaScriptBridge.kt`
-- **Command Registry**: `pluginapi/src/main/java/de/check24/profis/partner/pluginapi/features/webview/bridge/DefaultBridgeMessageHandler.kt`
+- **Android Implementation**: `android-sample/app/src/main/java/com/check24/bridgesample/bridge/JavaScriptBridge.kt`
+- **Command Registry**: `android-sample/app/src/main/assets/index.html`
 - **JavaScript API Documentation**: `js.md`
 - **Live Demo**: `pluginapi/src/debug/assets/c24/index.html`
 - **Check-mate Specification**: https://github.com/kibotu/check-mate
