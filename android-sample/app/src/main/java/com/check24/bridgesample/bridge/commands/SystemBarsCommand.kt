@@ -2,6 +2,8 @@ package com.check24.bridgesample.bridge.commands
 
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
+import com.check24.bridgesample.bridge.commands.utils.isLightNavigationBar
+import com.check24.bridgesample.bridge.commands.utils.isLightStatusBar
 import com.check24.bridgesample.bridge.commands.utils.showSystemNavigationBar
 import com.check24.bridgesample.bridge.commands.utils.showSystemStatusBar
 import com.github.florent37.application.provider.ActivityProvider
@@ -40,12 +42,10 @@ class SystemBarsCommand : BridgeCommand {
             Timber.i("[handle] showStatusBar=$showStatusBar showSystemNavigation=$showSystemNavigation")
 
             val activity = ActivityProvider.currentActivity
-            if (activity == null) {
-                return@withContext BridgeResponseUtils.createErrorResponse(
+                ?: return@withContext BridgeResponseUtils.createErrorResponse(
                     "NO_ACTIVITY",
                     "No active activity"
                 )
-            }
 
             activity.window?.showSystemStatusBar = showStatusBar
             activity.window?.showSystemNavigationBar = showSystemNavigation

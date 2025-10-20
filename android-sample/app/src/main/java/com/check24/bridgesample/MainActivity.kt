@@ -9,9 +9,13 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Divider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -23,27 +27,41 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.check24.bridgesample.bridge.DefaultBridgeMessageHandler
 import com.check24.bridgesample.bridge.JavaScriptBridge
+import com.check24.bridgesample.bridge.TopNavigationService
 import timber.log.Timber
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import com.check24.bridgesample.bridge.commands.utils.isLightNavigationBar
+import com.check24.bridgesample.bridge.commands.utils.isLightStatusBar
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        enableEdgeToEdge()
+
+        window?.isLightNavigationBar = true
+        window?.isLightStatusBar = true
+
         super.onCreate(savedInstanceState)
+
+
         setContent {
             var selectedTabIndex by remember { mutableIntStateOf(0) }
             val navController = rememberNavController()
+            val topNavConfig by TopNavigationService.config.collectAsState()
 
             LaunchedEffect(selectedTabIndex) {
                 when (selectedTabIndex) {
@@ -55,7 +73,35 @@ class MainActivity : ComponentActivity() {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
-                    TopAppBar(title = { Text(text = "Check-Mate Bridge Sample") })
+                    if (topNavConfig.isVisible) {
+                        Column {
+                            TopAppBar(
+                                title = {
+                                    val titleText = if (topNavConfig.showLogo) {
+                                        "CHECK24"
+                                    } else {
+                                        topNavConfig.title ?: "Check-Mate Bridge Sample"
+                                    }
+                                    Text(text = titleText)
+                                },
+                                navigationIcon = {
+                                    if (topNavConfig.showUpArrow) {
+                                        IconButton(onClick = { onBackPressedDispatcher.onBackPressed() }) {
+                                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                                        }
+                                    }
+                                },
+                                actions = {
+                                    if (topNavConfig.showProfileIconWidget) {
+                                        Icon(imageVector = Icons.Filled.Person, contentDescription = "Profile")
+                                    }
+                                }
+                            )
+                            if (topNavConfig.showDivider) {
+                                Divider()
+                            }
+                        }
+                    }
                 },
                 bottomBar = {
                     NavigationBar {
@@ -89,13 +135,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun WebViewScreen(url: String) {
-    val context = LocalContext.current
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { ctx ->
-            @SuppressLint("SetJavaScriptEnabled")
             WebView(ctx).apply {
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true

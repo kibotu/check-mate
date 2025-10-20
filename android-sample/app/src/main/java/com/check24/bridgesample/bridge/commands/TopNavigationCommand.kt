@@ -2,6 +2,7 @@ package com.check24.bridgesample.bridge.commands
 
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
+import com.check24.bridgesample.bridge.TopNavigationService
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -46,18 +47,17 @@ class TopNavigationCommand : BridgeCommand {
 
             Timber.i("[handle] isVisible=$isVisible title=$title showUpArrow=$showUpArrow")
 
-            // Build the TopNavigationConfig
-            val config = TopNavigationConfig(
-                isVisible = isVisible,
-                title = title.takeIf { it.isNotEmpty() },
-                showUpArrow = showUpArrow,
-                showDivider = showDivider,
-                showLogo = showLogo,
-                showProfileIconWidget = showProfileIconWidget,
-                drawBehindStatusBar = !isVisible
+            TopNavigationService.applyConfig(
+                TopNavigationConfig(
+                    isVisible = isVisible,
+                    title = title.takeIf { it.isNotEmpty() },
+                    showUpArrow = showUpArrow,
+                    showDivider = showDivider,
+                    showLogo = showLogo,
+                    showProfileIconWidget = showProfileIconWidget,
+                    drawBehindStatusBar = !isVisible
+                )
             )
-
-//            CorePluginServices.Companion.services.topNavigationService.applyConfig(config)
             BridgeResponseUtils.createSuccessResponse()
         } catch (e: Exception) {
             Timber.e(e)
