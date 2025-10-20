@@ -17,6 +17,9 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -164,11 +167,11 @@ class MainActivity : ComponentActivity() {
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
             ) {
-                Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+                Column {
                     AnimatedVisibility(
                         visible = isBottomBarVisible,
-                        enter = expandVertically() + fadeIn(animationSpec = tween(200)),
-                        exit = shrinkVertically() + fadeOut(animationSpec = tween(200))
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it })
                     ) {
                         NavigationBar(containerColor = Color.White, windowInsets = WindowInsets(0)) {
                             NavigationBarItem(
