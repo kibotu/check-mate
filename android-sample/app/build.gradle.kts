@@ -35,13 +35,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        allWarningsAsErrors = false
-        kotlinOptions.verbose = true
-    }
-
     kotlin {
         compilerOptions {
+            allWarningsAsErrors.set(false)
+            verbose.set(true)
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
