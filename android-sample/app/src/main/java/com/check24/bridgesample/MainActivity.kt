@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.check24.bridgesample.bridge.DefaultBridgeMessageHandler
 import com.check24.bridgesample.bridge.JavaScriptBridge
 import com.check24.bridgesample.bridge.TopNavigationService
+import com.check24.bridgesample.bridge.BottomNavigationService
 import timber.log.Timber
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
             var selectedTabIndex by remember { mutableIntStateOf(0) }
             val navController = rememberNavController()
             val topNavConfig by TopNavigationService.config.collectAsState()
+            val isBottomBarVisible by BottomNavigationService.isVisible.collectAsState()
 
             LaunchedEffect(selectedTabIndex) {
                 when (selectedTabIndex) {
@@ -104,19 +106,21 @@ class MainActivity : ComponentActivity() {
                     }
                 },
                 bottomBar = {
-                    NavigationBar {
-                        NavigationBarItem(
-                            selected = selectedTabIndex == 0,
-                            onClick = { selectedTabIndex = 0 },
-                            label = { Text("Assets") },
-                            icon = { Icon(imageVector = Icons.Filled.Home, contentDescription = null) }
-                        )
-                        NavigationBarItem(
-                            selected = selectedTabIndex == 1,
-                            onClick = { selectedTabIndex = 1 },
-                            label = { Text("Portfolio") },
-                            icon = { Icon(imageVector = Icons.Filled.Public, contentDescription = null) }
-                        )
+                    if (isBottomBarVisible) {
+                        NavigationBar {
+                            NavigationBarItem(
+                                selected = selectedTabIndex == 0,
+                                onClick = { selectedTabIndex = 0 },
+                                label = { Text("Assets") },
+                                icon = { Icon(imageVector = Icons.Filled.Home, contentDescription = null) }
+                            )
+                            NavigationBarItem(
+                                selected = selectedTabIndex == 1,
+                                onClick = { selectedTabIndex = 1 },
+                                label = { Text("Portfolio") },
+                                icon = { Icon(imageVector = Icons.Filled.Public, contentDescription = null) }
+                            )
+                        }
                     }
                 }
             ) { paddingValues ->
