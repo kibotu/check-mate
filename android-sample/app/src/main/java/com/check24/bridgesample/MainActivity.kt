@@ -12,9 +12,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -32,7 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.check24.bridgesample.bridge.DefaultBridgeMessageHandler
 import com.check24.bridgesample.bridge.JavaScriptBridge
 import timber.log.Timber
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Public
@@ -57,30 +57,32 @@ class MainActivity : ComponentActivity() {
                 topBar = {
                     TopAppBar(title = { Text(text = "Check-Mate Bridge Sample") })
                 },
-            ) { paddingValues ->
-                Column(modifier = Modifier.fillMaxSize()) {
-                    TabRow(selectedTabIndex = selectedTabIndex) {
-                        Tab(
+                bottomBar = {
+                    NavigationBar {
+                        NavigationBarItem(
                             selected = selectedTabIndex == 0,
                             onClick = { selectedTabIndex = 0 },
-                            text = { Text("Assets") },
+                            label = { Text("Assets") },
                             icon = { Icon(imageVector = Icons.Filled.Home, contentDescription = null) }
                         )
-                        Tab(
+                        NavigationBarItem(
                             selected = selectedTabIndex == 1,
                             onClick = { selectedTabIndex = 1 },
-                            text = { Text("Portfolio") },
+                            label = { Text("Portfolio") },
                             icon = { Icon(imageVector = Icons.Filled.Public, contentDescription = null) }
                         )
                     }
-                    NavHost(
-                        navController = navController,
-                        startDestination = "tab1",
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        composable("tab1") { WebViewScreen(url = "file:///android_asset/index.html") }
-                        composable("tab2") { WebViewScreen(url = "https://portfolio.kibotu.net/") }
-                    }
+                }
+            ) { paddingValues ->
+                NavHost(
+                    navController = navController,
+                    startDestination = "tab1",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    composable("tab1") { WebViewScreen(url = "file:///android_asset/index.html") }
+                    composable("tab2") { WebViewScreen(url = "https://portfolio.kibotu.net/") }
                 }
             }
         }
