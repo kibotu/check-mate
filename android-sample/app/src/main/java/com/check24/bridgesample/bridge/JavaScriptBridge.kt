@@ -43,7 +43,6 @@ class JavaScriptBridge(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     companion object {
-        private const val TAG = "JavaScriptBridge"
         const val BRIDGE_NAME = "Bridge"
 
         // Schema version: Simple integer, increment on breaking changes

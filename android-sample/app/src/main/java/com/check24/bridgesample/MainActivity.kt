@@ -10,7 +10,24 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -18,7 +35,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Divider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -29,6 +48,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -67,47 +88,89 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(selectedTabIndex) {
                 when (selectedTabIndex) {
-                    0 -> navController.navigate("tab1") { popUpTo(navController.graph.startDestinationId) { inclusive = true } }
-                    1 -> navController.navigate("tab2") { popUpTo(navController.graph.startDestinationId) { inclusive = true } }
+                    0 -> navController.navigate("tab1") {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+
+                    1 -> navController.navigate("tab2") {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
 
+            Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
+                contentWindowInsets = WindowInsets(0),
                 topBar = {
-                    if (topNavConfig.isVisible) {
-                        Column {
-                            TopAppBar(
-                                title = {
-                                    val titleText = if (topNavConfig.showLogo) {
-                                        "CHECK24"
-                                    } else {
-                                        topNavConfig.title ?: "Check-Mate Bridge Sample"
-                                    }
-                                    Text(text = titleText)
-                                },
-                                navigationIcon = {
-                                    if (topNavConfig.showUpArrow) {
-                                        IconButton(onClick = { onBackPressedDispatcher.onBackPressed() }) {
-                                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                    Column(modifier = Modifier.animateContentSize()) {
+                        if (topNavConfig.isVisible) {
+                            Column(modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
+                                TopAppBar(
+                                    title = {
+                                        val titleText = if (topNavConfig.showLogo) {
+                                            "CHECK24"
+                                        } else {
+                                            topNavConfig.title ?: "Check-Mate Bridge Sample"
+                                        }
+                                        Text(text = titleText)
+                                    },
+                                    navigationIcon = {
+                                        if (topNavConfig.showUpArrow) {
+                                            IconButton(onClick = { onBackPressedDispatcher.onBackPressed() }) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.ArrowBack,
+                                                    contentDescription = "Back"
+                                                )
+                                            }
+                                        }
+                                    },
+                                    actions = {
+                                        if (topNavConfig.showProfileIconWidget) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Person,
+                                                contentDescription = "Profile"
+                                            )
                                         }
                                     }
-                                },
-                                actions = {
-                                    if (topNavConfig.showProfileIconWidget) {
-                                        Icon(imageVector = Icons.Filled.Person, contentDescription = "Profile")
-                                    }
+                                )
+                                if (topNavConfig.showDivider) {
+                                    Divider()
                                 }
-                            )
-                            if (topNavConfig.showDivider) {
-                                Divider()
                             }
                         }
                     }
                 },
-                bottomBar = {
-                    if (isBottomBarVisible) {
-                        NavigationBar {
+                bottomBar = { }
+            ) { paddingValues ->
+                NavHost(
+                    navController = navController,
+                    startDestination = "tab1",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .animateContentSize()
+                ) {
+                    composable("tab1") { WebViewScreen(url = "file:///android_asset/index.html") }
+                    composable("tab2") { WebViewScreen(url = "https://portfolio.kibotu.net/") }
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+                    AnimatedVisibility(
+                        visible = isBottomBarVisible,
+                        enter = expandVertically() + fadeIn(animationSpec = tween(200)),
+                        exit = shrinkVertically() + fadeOut(animationSpec = tween(200))
+                    ) {
+                        NavigationBar(containerColor = Color.White, windowInsets = WindowInsets(0)) {
                             NavigationBarItem(
                                 selected = selectedTabIndex == 0,
                                 onClick = { selectedTabIndex = 0 },
@@ -123,17 +186,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-            ) { paddingValues ->
-                NavHost(
-                    navController = navController,
-                    startDestination = "tab1",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    composable("tab1") { WebViewScreen(url = "file:///android_asset/index.html") }
-                    composable("tab2") { WebViewScreen(url = "https://portfolio.kibotu.net/") }
-                }
+            }
             }
         }
     }
@@ -151,7 +204,10 @@ private fun WebViewScreen(url: String) {
                 settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 webChromeClient = WebChromeClient()
                 webViewClient = object : WebViewClient() {
-                    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView?,
+                        request: WebResourceRequest?
+                    ): Boolean {
                         return false
                     }
 
