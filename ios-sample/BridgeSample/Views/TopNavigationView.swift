@@ -31,23 +31,25 @@ class TopNavigationService: ObservableObject {
                 showLogo: Bool? = nil,
                 showProfileIconWidget: Bool? = nil) {
         DispatchQueue.main.async {
-            if let isVisible = isVisible {
-                self.config.isVisible = isVisible
-            }
-            if let title = title {
-                self.config.title = title
-            }
-            if let showBackButton = showBackButton {
-                self.config.showBackButton = showBackButton
-            }
-            if let showDivider = showDivider {
-                self.config.showDivider = showDivider
-            }
-            if let showLogo = showLogo {
-                self.config.showLogo = showLogo
-            }
-            if let showProfileIconWidget = showProfileIconWidget {
-                self.config.showProfileIconWidget = showProfileIconWidget
+            withAnimation(.easeInOut(duration: 0.3)) {
+                if let isVisible = isVisible {
+                    self.config.isVisible = isVisible
+                }
+                if let title = title {
+                    self.config.title = title
+                }
+                if let showBackButton = showBackButton {
+                    self.config.showBackButton = showBackButton
+                }
+                if let showDivider = showDivider {
+                    self.config.showDivider = showDivider
+                }
+                if let showLogo = showLogo {
+                    self.config.showLogo = showLogo
+                }
+                if let showProfileIconWidget = showProfileIconWidget {
+                    self.config.showProfileIconWidget = showProfileIconWidget
+                }
             }
         }
     }

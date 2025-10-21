@@ -21,7 +21,9 @@ class BottomNavigationService: ObservableObject {
     
     func setVisible(_ isVisible: Bool) {
         DispatchQueue.main.async {
-            self.config.isVisible = isVisible
+            withAnimation(.easeInOut(duration: 0.3)) {
+                self.config.isVisible = isVisible
+            }
         }
     }
 }
