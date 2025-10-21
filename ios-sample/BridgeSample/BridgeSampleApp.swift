@@ -4,8 +4,7 @@ import SwiftUI
 struct BridgeSampleApp: App {
     var body: some Scene {
         WindowGroup {
-            
+            MainTabView()
         }
     }
 }
-

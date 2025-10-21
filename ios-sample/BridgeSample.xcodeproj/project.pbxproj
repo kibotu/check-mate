@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		A1000001000000000000001 /* BridgeSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* BridgeSampleApp.swift */; };
 		A1000011000000000000001 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = A1000012000000000000001 /* index.html */; };
+		A1000031000000000000001 /* TopNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000032000000000000001 /* TopNavigationView.swift */; };
+		A1000033000000000000001 /* BottomNavigationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000034000000000000001 /* BottomNavigationService.swift */; };
+		A1000035000000000000001 /* WebViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000036000000000000001 /* WebViewContainer.swift */; };
+		A1000037000000000000001 /* WebViewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000038000000000000001 /* WebViewScreen.swift */; };
+		A1000039000000000000001 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000040000000000000001 /* MainTabView.swift */; };
 		C35C0E5B2EA780C000D4D420 /* OpenSettingsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4A2EA780C000D4D420 /* OpenSettingsHandler.swift */; };
 		C35C0E5C2EA780C000D4D420 /* LoadSecureDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E472EA780C000D4D420 /* LoadSecureDataHandler.swift */; };
 		C35C0E5D2EA780C000D4D420 /* TrackEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E532EA780C000D4D420 /* TrackEventHandler.swift */; };
@@ -40,6 +45,11 @@
 		A1000012000000000000001 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		A1000013000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000014000000000000001 /* BridgeSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BridgeSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000032000000000000001 /* TopNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopNavigationView.swift; sourceTree = "<group>"; };
+		A1000034000000000000001 /* BottomNavigationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavigationService.swift; sourceTree = "<group>"; };
+		A1000036000000000000001 /* WebViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainer.swift; sourceTree = "<group>"; };
+		A1000038000000000000001 /* WebViewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewScreen.swift; sourceTree = "<group>"; };
+		A1000040000000000000001 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		C35C0E412EA780C000D4D420 /* BottomNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavigationHandler.swift; sourceTree = "<group>"; };
 		C35C0E422EA780C000D4D420 /* CopyToClipboardHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyToClipboardHandler.swift; sourceTree = "<group>"; };
 		C35C0E432EA780C000D4D420 /* DeviceInfoHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoHandler.swift; sourceTree = "<group>"; };
@@ -89,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				C35C0E5A2EA780C000D4D420 /* Bridge */,
+				A1000041000000000000001 /* Views */,
 				A1000013000000000000001 /* Info.plist */,
 				A1000002000000000000001 /* BridgeSampleApp.swift */,
 				A1000020000000000000001 /* Resources */,
@@ -110,6 +121,18 @@
 				A1000012000000000000001 /* index.html */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		A1000041000000000000001 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A1000032000000000000001 /* TopNavigationView.swift */,
+				A1000034000000000000001 /* BottomNavigationService.swift */,
+				A1000036000000000000001 /* WebViewContainer.swift */,
+				A1000038000000000000001 /* WebViewScreen.swift */,
+				A1000040000000000000001 /* MainTabView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		C35C0E552EA780C000D4D420 /* Commands */ = {
@@ -218,6 +241,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001000000000000001 /* BridgeSampleApp.swift in Sources */,
+				A1000031000000000000001 /* TopNavigationView.swift in Sources */,
+				A1000033000000000000001 /* BottomNavigationService.swift in Sources */,
+				A1000035000000000000001 /* WebViewContainer.swift in Sources */,
+				A1000037000000000000001 /* WebViewScreen.swift in Sources */,
+				A1000039000000000000001 /* MainTabView.swift in Sources */,
 				C35C0E5B2EA780C000D4D420 /* OpenSettingsHandler.swift in Sources */,
 				C35C0E5C2EA780C000D4D420 /* LoadSecureDataHandler.swift in Sources */,
 				C35C0E5D2EA780C000D4D420 /* TrackEventHandler.swift in Sources */,

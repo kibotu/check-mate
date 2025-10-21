@@ -1,462 +1,162 @@
-# iOS Bridge Sample App  [![iOS CI](https://github.com/kibotu/check-mate/actions/workflows/ios.yml/badge.svg)](https://github.com/kibotu/check-mate/actions/workflows/ios.yml)
+# iOS Bridge Sample App
 
-A complete iOS sample app demonstrating the JavaScript Bridge specification for bidirectional communication between native iOS and WebView.
+A sample iOS application demonstrating the JavaScript Bridge integration with SwiftUI.
 
-## Overview
+## Architecture
 
-This sample app implements the complete bridge specification with:
+The app follows the same structure as the Android sample:
 
-- ✅ **Minimal API**: Just `call()` and `on()` methods
-- ✅ **Pure JSON**: No method/param parsing, just JSON in/out
-- ✅ **Async/await**: Modern async patterns throughout
-- ✅ **Request-Response & Fire-and-Forget**: Both patterns supported
-- ✅ **Complete Examples**: Device info, permissions, UI, storage, analytics
-- ✅ **Production Ready**: Error handling, timeouts, debug mode
+### Components
+
+1. **MainTabView** - Main container with bottom tab navigation
+   - Tab 1: Bridge Demo (loads local `index.html`)
+   - Tab 2: External Web (loads external website)
+
+2. **TopNavigationView** - Customizable top navigation bar
+   - Controlled via bridge commands from WebView
+   - Supports title, back button, logo, profile icon
+   - Can be shown/hidden dynamically
+
+3. **BottomNavigationService** - Bottom tab bar state management
+   - Controls visibility of bottom navigation
+   - Managed via bridge commands
+
+4. **WebViewContainer** - UIKit WKWebView wrapper for SwiftUI
+   - Integrates JavaScriptBridge
+   - Handles WebView lifecycle
+
+5. **JavaScriptBridge** - Core bridge implementation
+   - Bidirectional communication (JS ↔ Native)
+   - Command handler registry
+   - Schema versioning support
+
+### Bridge Commands
+
+All commands from `index.html` are supported:
+
+- **Device & System**: `deviceInfo`, `networkState`, `openSettings`
+- **UI Actions**: `showToast`, `showAlert`
+- **Navigation Control**: `topNavigation`, `bottomNavigation`
+- **System Bars**: `systemBars` (iOS has platform limitations)
+- **Haptics**: `haptic`
+- **Navigation**: `navigation` (internal/external URLs)
+- **System Actions**: `copyToClipboard`
+- **Lifecycle Events**: `lifecycleEvents`
+- **Push Notifications**: Native → Web events
+- **Secure Storage**: `saveSecureData`, `loadSecureData`, `removeSecureData`
+- **Analytics**: `trackEvent`, `trackScreen`
 
 ## Project Structure
 
 ```
 ios-sample/
 ├── BridgeSample/
-│   ├── BridgeSampleApp.swift       # Main app entry point
-│   ├── ContentView.swift           # SwiftUI main view
-│   ├── Bridge/
-│   │   ├── WebViewBridge.swift     # Bridge JavaScript & error types
-│   │   ├── BridgeViewController.swift  # WKWebView controller & message handling
-│   │   └── BridgeActions.swift     # Native action implementations
-│   ├── Resources/
-│   │   └── index.html             # Sample web page with bridge demos
-│   └── Info.plist
+│   ├── BridgeSampleApp.swift          # App entry point
+│   ├── Views/                          # SwiftUI views
+│   │   ├── MainTabView.swift          # Main tab container
+│   │   ├── TopNavigationView.swift    # Top nav bar
+│   │   ├── BottomNavigationService.swift # Bottom nav state
+│   │   ├── WebViewContainer.swift     # WebView wrapper
+│   │   └── WebViewScreen.swift        # WebView screen
+│   ├── Bridge/                         # Bridge implementation
+│   │   ├── JavaScriptBridge.swift     # Core bridge
+│   │   ├── BridgeCommand.swift        # Command protocol
+│   │   ├── JavaScriptBridgeMessage.swift # Message types
+│   │   ├── JavaScriptBridgeScript.swift  # Injected JS
+│   │   └── Commands/                   # Command handlers
+│   └── Resources/
+│       └── index.html                  # Bridge demo page
 └── BridgeSample.xcodeproj/
 ```
 
-## Requirements
+## Building & Running
 
-- **Xcode**: 14.0 or later
-- **iOS**: 15.0 or later
-- **Swift**: 5.0 or later
+### Requirements
 
-## Getting Started
+- Xcode 14.0+
+- iOS 15.0+ deployment target
+- Swift 5.0+
 
-### 1. Open the Project
+### Steps
 
-```bash
-cd ios-sample
-open BridgeSample.xcodeproj
-```
+1. Open `BridgeSample.xcodeproj` in Xcode
+2. Select a simulator or device
+3. Press `Cmd+R` to build and run
 
-### 2. Build and Run (Xcode GUI)
+### Features
 
-1. Select a simulator or device from the scheme selector
-2. Press `Cmd + R` to build and run
-3. The app will launch with a WebView showing the bridge demo
+- ✅ Two-tab bottom navigation
+- ✅ Controllable top navigation bar
+- ✅ WebView with JavaScript Bridge
+- ✅ All bridge commands implemented
+- ✅ Bidirectional communication
+- ✅ Push notification simulation
+- ✅ Lifecycle event forwarding
+- ✅ Secure storage with Keychain
+- ✅ Schema versioning
 
-### 3. Build and Run (Command Line)
+## Key Differences from Android
 
-Alternatively, you can build and run from the command line:
+1. **System Bars**: iOS doesn't support hiding status bar/navigation in the same way as Android
+2. **Toast**: iOS uses native alerts instead of Android-style toasts
+3. **WebView**: Uses WKWebView instead of Android WebView
+4. **Navigation**: SwiftUI-based tab navigation instead of Compose Navigation
 
-#### Step 1: List Available Simulators
+## Testing the Bridge
 
-```bash
-xcrun simctl list devices available | grep -E "iPhone|iPad"
-```
+Open the app and interact with the bridge demo page:
 
-This will show all available simulators, for example:
-```
-iPhone 16 Pro Max (96A52C46-65B2-4706-8997-38C45AC9623A) (Shutdown)
-iPhone 17 Pro Max (6E61BF3A-F907-4617-898B-1CA4C8EAD012) (Shutdown)
-```
+1. **Device Info**: Shows iOS device details
+2. **Network Status**: Shows current connectivity
+3. **UI Controls**: Toggle top/bottom navigation visibility
+4. **Navigation**: Test internal/external navigation
+5. **Storage**: Test secure data persistence
+6. **Lifecycle**: Enable events and background/foreground the app
 
-#### Step 2: Build the Project 
+## Architecture Decisions
 
-```bash
-cd ios-sample
-xcodebuild \ 
-  -project BridgeSample.xcodeproj \
-  -scheme BridgeSample \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' \
-  clean build
-```
+### Why SwiftUI?
 
-Replace `iPhone 17 Pro Max` with your desired simulator name from Step 1.
+- Modern, declarative UI framework
+- Better integration with Swift
+- Cleaner state management with `@ObservedObject`
+- Easier to maintain than UIKit
 
-#### Step 3: Boot the Simulator
+### Why Singleton Services?
 
-```bash
-xcrun simctl boot "iPhone 17 Pro Max"
-```
+`TopNavigationService.shared` and `BottomNavigationService.shared` provide:
+- Single source of truth for navigation state
+- Easy access from bridge handlers
+- Observable state changes via `@Published`
+- No need for complex dependency injection
 
-Note: If the simulator is already running, this command will return an error but you can ignore it.
+### Why UIViewRepresentable for WebView?
 
-#### Step 4: Install the App
-
-```bash
-xcrun simctl install "iPhone 17 Pro Max" \
-  ~/Library/Developer/Xcode/DerivedData/BridgeSample-*/Build/Products/Debug-iphonesimulator/BridgeSample.app
-```
-
-Or with the exact path:
-```bash
-# Find the exact path first
-find ~/Library/Developer/Xcode/DerivedData -name "BridgeSample.app" -path "*/Debug-iphonesimulator/*" 2>/dev/null
-
-# Then install using that path
-xcrun simctl install "iPhone 17 Pro Max" /path/to/BridgeSample.app
-```
-
-#### Step 5: Launch the App
-
-```bash
-xcrun simctl launch "iPhone 17 Pro Max" com.example.bridgesample
-```
-
-#### Step 6: Open Simulator UI (Optional)
-
-If the Simulator window is not visible:
-
-```bash
-open -a Simulator
-```
-
-#### All-in-One Script
-
-You can combine all steps into a single script:
-
-```bash
-#!/bin/bash
-
-SIMULATOR_NAME="iPhone 17 Pro Max"
-BUNDLE_ID="com.example.bridgesample"
-PROJECT_DIR="ios-sample"
-
-# Build
-echo "Building project..."
-cd "$PROJECT_DIR"
-xcodebuild -project BridgeSample.xcodeproj \
-  -scheme BridgeSample \
-  -destination "platform=iOS Simulator,name=$SIMULATOR_NAME" \
-  clean build
-
-# Boot simulator
-echo "Booting simulator..."
-xcrun simctl boot "$SIMULATOR_NAME" 2>/dev/null || true
-
-# Find and install app
-echo "Installing app..."
-APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "BridgeSample.app" -path "*/Debug-iphonesimulator/*" 2>/dev/null | head -1)
-xcrun simctl install "$SIMULATOR_NAME" "$APP_PATH"
-
-# Launch app
-echo "Launching app..."
-xcrun simctl launch "$SIMULATOR_NAME" "$BUNDLE_ID"
-
-# Open simulator UI
-open -a Simulator
-
-echo "✅ App is now running!"
-```
-
-### 4. Try the Features
-
-The sample HTML page includes interactive demos for:
-
-- **Device & System**: Get device info, request permissions, open settings, clipboard
-- **UI Actions**: Show toast, alerts, set title, open URLs
-- **Storage**: Save/load/remove data (uses UserDefaults)
-- **Analytics**: Track events and screens (fire-and-forget pattern)
-
-## Architecture
-
-### Bridge JavaScript (WebViewBridge.swift)
-
-The bridge JavaScript is injected into the WebView at document start. It provides:
-
-```javascript
-// Web → Native
-await window.bridge.call({ data: { action: '...', content: {} } })
-
-// Native → Web handler
-window.bridge.on(async (message) => { ... })
-
-// Lifecycle
-await window.bridge.ready()
-window.bridge.isReady
-
-// Debug
-window.bridge.setDebug(true)
-```
-
-### Native Message Handler (BridgeViewController.swift)
-
-The view controller:
-- Sets up WKWebView with bridge injection
-- Receives messages via `WKScriptMessageHandler`
-- Dispatches actions to `BridgeActionHandler`
-- Sends responses back to JavaScript
-
-### Action Handler (BridgeActions.swift)
-
-Implements all native actions:
-
-```swift
-func handleAction(_ action: String, content: [String: Any]?) async throws -> Any?
-```
-
-Actions include:
-- `getDeviceInfo()` - Device metadata
-- `requestPermission(type)` - Camera, location permissions
-- `showToast(message, duration)` - Native toast
-- `showAlert(title, message, buttons)` - Native alert
-- `setSecureData(key, value)` - Storage (UserDefaults)
-- `trackEvent(name, properties)` - Analytics (console log)
-
-### SwiftUI Integration (ContentView.swift)
-
-SwiftUI wrapper around UIKit `WKWebView`:
-
-```swift
-BridgeWebViewRepresentable(controller: bridgeController)
-```
-
-Shows bridge status and provides toolbar actions.
-
-## Usage Examples
-
-### From Web to Native
-
-```javascript
-// Request-Response (await for result)
-const deviceInfo = await window.bridge.call({
-  data: { action: 'getDeviceInfo' }
-});
-
-// Fire-and-Forget (no await)
-window.bridge.call({
-  data: {
-    action: 'trackEvent',
-    content: { event: 'button_click' }
-  }
-});
-```
-
-### From Native to Web
-
-```swift
-// Fire-and-Forget Event
-bridgeController.sendEventToWeb(
-    action: "appStateChanged",
-    content: ["state": "background"]
-)
-
-// Request-Response (await result)
-let result = try await bridgeController.callWeb(
-    action: "getWebState",
-    content: [:]
-)
-```
-
-## Key Implementation Details
-
-### Thread Safety
-
-All WebView operations run on the main thread:
-
-```swift
-DispatchQueue.main.async {
-    self.webView.evaluateJavaScript(js)
-}
-```
-
-### JSON Serialization
-
-Proper JSON handling for native → web communication:
-
-```swift
-guard let jsonData = try? JSONSerialization.data(withJSONObject: message),
-      let jsonString = String(data: jsonData, encoding: .utf8) else {
-    throw BridgeError.jsonSerializationFailed
-}
-
-let js = "window.bridge._onNativeMessage(\(jsonString))"
-```
-
-### Error Handling
-
-Structured errors with codes:
-
-```swift
-enum BridgeError: LocalizedError {
-    case invalidMessage
-    case actionNotFound(String)
-    case timeout
-    // ...
-    
-    var code: String { ... }
-}
-```
-
-### Request-Response Tracking
-
-Pending requests tracked with continuations:
-
-```swift
-private var pendingRequests: [String: PendingRequest] = [:]
-
-// Store pending request
-pendingRequests[id] = continuation
-
-// Resolve when response arrives
-pending.resolve(result)
-```
-
-## Adding New Actions
-
-To add a new native action:
-
-1. **Add case to BridgeActions.swift**:
-
-```swift
-case "myNewAction":
-    guard let param = content?["param"] as? String else {
-        throw BridgeError.invalidParameters
-    }
-    return try await myNewAction(param: param)
-```
-
-2. **Implement the method**:
-
-```swift
-private func myNewAction(param: String) async throws -> [String: Any] {
-    // Your implementation
-    return ["result": "success"]
-}
-```
-
-3. **Call from JavaScript**:
-
-```javascript
-const result = await window.bridge.call({
-  data: {
-    action: 'myNewAction',
-    content: { param: 'value' }
-  }
-});
-```
-
-## Testing
-
-### Run All Tests Button
-
-The HTML page includes a "Run All Tests" button that executes multiple actions in sequence.
-
-### Debug Mode
-
-Toggle debug mode from:
-- The menu (three dots) in the navigation bar
-- JavaScript: `window.bridge.setDebug(true)`
-
-Debug mode logs all bridge operations to the console.
-
-### Manual Testing
-
-Use the iOS Simulator to test:
-- Different device types (iPhone, iPad)
-- Different iOS versions
-- Permission flows
-- UI interactions
-
-## Performance Considerations
-
-- **Message Size**: Keep messages < 100KB (< 1MB max)
-- **Frequency**: Debounce rapid calls to avoid flooding the bridge
-- **Threading**: All WebView operations are on main thread
-- **Memory**: Pending requests have 30s timeout to prevent leaks
-
-## Security Notes
-
-The current implementation:
-- ✅ Validates all action names
-- ✅ Checks parameter types
-- ✅ Uses try-catch for all operations
-- ⚠️ Storage uses UserDefaults (use Keychain for sensitive data)
-- ⚠️ Loads local HTML (validate URLs for remote content)
-
-For production:
-1. Whitelist allowed actions
-2. Validate all input parameters
-3. Use HTTPS for web content
-4. Implement rate limiting
-5. Use Keychain for secure storage
-6. Add Content Security Policy
+- WKWebView is UIKit-based
+- `UIViewRepresentable` bridges UIKit → SwiftUI
+- Provides full control over WKWebView configuration
+- Enables proper bridge integration
 
 ## Troubleshooting
 
-### Bridge not available
+### Bridge not working?
 
-**Symptom**: `window.bridge` is undefined
+1. Check browser console for JavaScript errors
+2. Verify `index.html` is in Resources folder
+3. Ensure all Swift files are added to Xcode target
 
-**Solution**: 
-- Check that bridge JavaScript is injected at document start
-- Ensure WKUserScript is added to configuration
-- Wait for `bridgeReady` event
+### WebView not loading?
 
-### Actions not responding
+1. Check Info.plist for required keys
+2. Verify file URL is correct
+3. Check Xcode console for error messages
 
-**Symptom**: Calls timeout or return errors
+### Navigation not updating?
 
-**Solution**:
-- Check console for error messages
-- Enable debug mode
-- Verify action name is correct
-- Check parameter types match expected format
-
-### WebView not loading
-
-**Symptom**: Blank white screen
-
-**Solution**:
-- Check that `index.html` is in Resources folder
-- Verify file is included in build target
-- Check console for file loading errors
-- Try absolute file:// URL path
-
-### Permission requests not working
-
-**Symptom**: Permissions always denied
-
-**Solution**:
-- Check Info.plist has usage descriptions
-- Reset simulator: Device → Erase All Content and Settings
-- For location, proper delegate setup is needed
-
-## Next Steps
-
-This sample demonstrates the core bridge. To extend it:
-
-1. **Add more actions** based on your app needs
-2. **Integrate real analytics** (Firebase, Amplitude, etc.)
-3. **Use Keychain** for secure storage
-4. **Add network status** monitoring
-5. **Implement file uploads** (photos, documents)
-6. **Add biometric auth** (Face ID, Touch ID)
-7. **Create TypeScript definitions** for type safety
-
-## Resources
-
-- **Bridge Specification**: See `../spec.md` for complete details
-- **Apple WKWebView Docs**: https://developer.apple.com/documentation/webkit/wkwebview
-- **Swift Concurrency**: https://docs.swift.org/swift-book/LanguageGuide/Concurrency.html
+1. Ensure services are using `.shared` singleton
+2. Check that `@ObservedObject` is properly connected
+3. Verify DispatchQueue.main.async usage in handlers
 
 ## License
 
-This sample code is provided as-is for demonstration purposes.
-
-## Questions?
-
-Check the specification document (`spec.md`) for detailed information about:
-- Message format
-- Error handling
-- Design philosophy
-- Platform differences (iOS vs Android)
-- Common patterns
-
+See LICENSE file in repository root.
