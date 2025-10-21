@@ -1,6 +1,5 @@
-package com.check24.bridgesample.bridge.commands
+package com.check24.bridgesample.bridge.commands.bottomnavigation
 
-import com.check24.bridgesample.bridge.BottomNavigationService
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand

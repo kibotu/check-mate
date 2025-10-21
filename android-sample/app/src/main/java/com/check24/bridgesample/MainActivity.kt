@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import com.check24.bridgesample.bridge.JavaScriptBridge
-import com.check24.bridgesample.misc.isLightNavigationBar
-import com.check24.bridgesample.misc.isLightStatusBar
+import com.check24.bridgesample.bridge.commands.systembars.isLightNavigationBar
+import com.check24.bridgesample.bridge.commands.systembars.isLightStatusBar
 import com.check24.bridgesample.misc.weak
 import com.check24.bridgesample.ui.Screen
 

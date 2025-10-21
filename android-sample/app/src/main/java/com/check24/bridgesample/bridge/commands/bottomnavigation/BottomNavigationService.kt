@@ -1,4 +1,4 @@
-package com.check24.bridgesample.bridge
+package com.check24.bridgesample.bridge.commands.bottomnavigation
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,5 +12,3 @@ object BottomNavigationService {
         _isVisible.value = visible
     }
 }
-
-

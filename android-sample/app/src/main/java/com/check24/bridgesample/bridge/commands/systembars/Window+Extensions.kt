@@ -1,4 +1,4 @@
-package com.check24.bridgesample.misc
+package com.check24.bridgesample.bridge.commands.systembars
 
 import android.view.Window
 import androidx.core.view.WindowCompat

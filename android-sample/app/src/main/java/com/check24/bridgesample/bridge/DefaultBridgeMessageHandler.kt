@@ -1,6 +1,6 @@
 package com.check24.bridgesample.bridge
 
-import com.check24.bridgesample.bridge.commands.BottomNavigationCommand
+import com.check24.bridgesample.bridge.commands.bottomnavigation.BottomNavigationCommand
 import com.check24.bridgesample.bridge.commands.CheckNetworkStatusCommand
 import com.check24.bridgesample.bridge.commands.CopyToClipboardCommand
 import com.check24.bridgesample.bridge.commands.DeviceInfoCommand
@@ -14,8 +14,8 @@ import com.check24.bridgesample.bridge.commands.RequestPermissionsCommand
 import com.check24.bridgesample.bridge.commands.SaveSecureDataCommand
 import com.check24.bridgesample.bridge.commands.ShowAlertCommand
 import com.check24.bridgesample.bridge.commands.ShowToastCommand
-import com.check24.bridgesample.bridge.commands.SystemBarsCommand
-import com.check24.bridgesample.bridge.commands.TopNavigationCommand
+import com.check24.bridgesample.bridge.commands.systembars.SystemBarsCommand
+import com.check24.bridgesample.bridge.commands.topnavigation.TopNavigationCommand
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.RefreshCommand
 import timber.log.Timber

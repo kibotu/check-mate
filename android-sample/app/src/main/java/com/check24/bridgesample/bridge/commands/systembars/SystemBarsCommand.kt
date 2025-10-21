@@ -1,9 +1,7 @@
-package com.check24.bridgesample.bridge.commands
+package com.check24.bridgesample.bridge.commands.systembars
 
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
-import com.check24.bridgesample.misc.showSystemNavigationBar
-import com.check24.bridgesample.misc.showSystemStatusBar
 import com.github.florent37.application.provider.ActivityProvider
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers

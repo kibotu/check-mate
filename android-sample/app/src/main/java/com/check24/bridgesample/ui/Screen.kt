@@ -40,9 +40,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.check24.bridgesample.WebViewScreen
-import com.check24.bridgesample.bridge.BottomNavigationService
+import com.check24.bridgesample.bridge.commands.bottomnavigation.BottomNavigationService
 import com.check24.bridgesample.bridge.JavaScriptBridge
-import com.check24.bridgesample.bridge.TopNavigationService
+import com.check24.bridgesample.bridge.commands.topnavigation.TopNavigationService
 
 @ExperimentalMaterial3Api
 @Composable
