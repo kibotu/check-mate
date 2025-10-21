@@ -1,5 +1,11 @@
 package com.check24.bridgesample.bridge.commands
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import com.github.florent37.application.provider.ActivityProvider
+import com.github.florent37.application.provider.application
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import org.json.JSONObject
 
@@ -23,10 +29,49 @@ class CheckNetworkStatusCommand : BridgeCommand {
     override val action = "networkState"
 
     override suspend fun handle(content: Any?): JSONObject {
-//        val isConnected = CorePluginServices.services.networkAvailabilityService.isNetworkAvailable
+        val context = ActivityProvider.currentActivity ?: application
+        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        var isConnected = false
+        var connectionType = "none"
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val activeNetwork = connectivityManager.activeNetwork
+                if (activeNetwork != null) {
+                    val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+                    if (capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                        isConnected = true
+                        connectionType = when {
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "wifi"
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "cellular"
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> "ethernet"
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> "bluetooth"
+                            else -> "unknown"
+                        }
+                    }
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                val activeNetworkInfo = connectivityManager.activeNetworkInfo
+                @Suppress("DEPRECATION")
+                isConnected = activeNetworkInfo?.isConnectedOrConnecting == true
+                @Suppress("DEPRECATION")
+                connectionType = when (activeNetworkInfo?.type) {
+                    ConnectivityManager.TYPE_WIFI -> "wifi"
+                    ConnectivityManager.TYPE_MOBILE -> "cellular"
+                    ConnectivityManager.TYPE_ETHERNET -> "ethernet"
+                    else -> if (isConnected) "unknown" else "none"
+                }
+            }
+        } catch (_: Exception) {
+            isConnected = false
+            connectionType = "none"
+        }
+
         return JSONObject().apply {
-//            put("connected", isConnected)
-//            put("type", if (isConnected) "wifi" else "none")
+            put("connected", isConnected)
+            put("type", connectionType)
         }
     }
 }
