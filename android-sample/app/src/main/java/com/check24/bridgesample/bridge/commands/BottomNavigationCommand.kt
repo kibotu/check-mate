@@ -1,8 +1,8 @@
 package com.check24.bridgesample.bridge.commands
 
+import com.check24.bridgesample.bridge.BottomNavigationService
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
-import com.check24.bridgesample.bridge.BottomNavigationService
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -41,7 +41,10 @@ class BottomNavigationCommand : BridgeCommand {
             BridgeResponseUtils.createSuccessResponse()
         } catch (e: Exception) {
             Timber.e(e)
-            BridgeResponseUtils.createErrorResponse("BOTTOM_NAVIGATION_FAILED", e.message ?: "Failed to configure bottom navigation")
+            BridgeResponseUtils.createErrorResponse(
+                "BOTTOM_NAVIGATION_FAILED",
+                e.message ?: "Failed to configure bottom navigation"
+            )
         }
     }
 }

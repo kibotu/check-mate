@@ -1,8 +1,8 @@
 package com.check24.bridgesample.bridge.commands
 
+import com.check24.bridgesample.bridge.TopNavigationService
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
-import com.check24.bridgesample.bridge.TopNavigationService
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

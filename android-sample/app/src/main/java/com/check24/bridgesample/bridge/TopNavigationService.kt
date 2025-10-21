@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
  * updated by bridge commands and observed by UI (e.g., MainActivity).
  */
 object TopNavigationService {
-    private val _config: MutableStateFlow<TopNavigationConfig> = MutableStateFlow(TopNavigationConfig())
+    private val _config: MutableStateFlow<TopNavigationConfig> =
+        MutableStateFlow(TopNavigationConfig())
     val config: StateFlow<TopNavigationConfig> = _config
 
     fun applyConfig(newConfig: TopNavigationConfig) {

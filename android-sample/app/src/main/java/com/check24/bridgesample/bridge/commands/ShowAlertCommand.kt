@@ -1,9 +1,9 @@
 package com.check24.bridgesample.bridge.commands
 
 import androidx.appcompat.app.AlertDialog
-import com.github.florent37.application.provider.ActivityProvider
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
+import com.github.florent37.application.provider.ActivityProvider
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,13 +44,19 @@ class ShowAlertCommand : BridgeCommand {
         val buttons = BridgeParsingUtils.parseStringArray(content, "buttons")
 
         if (message.isEmpty()) {
-            return@withContext BridgeResponseUtils.createErrorResponse("INVALID_PARAMETER", "Missing 'message' parameter")
+            return@withContext BridgeResponseUtils.createErrorResponse(
+                "INVALID_PARAMETER",
+                "Missing 'message' parameter"
+            )
         }
 
         try {
             val activity = ActivityProvider.currentActivity
             if (activity == null) {
-                return@withContext BridgeResponseUtils.createErrorResponse("NO_ACTIVITY", "No active activity")
+                return@withContext BridgeResponseUtils.createErrorResponse(
+                    "NO_ACTIVITY",
+                    "No active activity"
+                )
             }
 
             AlertDialog.Builder(activity)
@@ -77,7 +83,10 @@ class ShowAlertCommand : BridgeCommand {
             BridgeResponseUtils.createSuccessResponse()
         } catch (e: Exception) {
             Timber.e(e)
-            BridgeResponseUtils.createErrorResponse("ALERT_FAILED", e.message ?: "Failed to show alert")
+            BridgeResponseUtils.createErrorResponse(
+                "ALERT_FAILED",
+                e.message ?: "Failed to show alert"
+            )
         }
     }
 }
