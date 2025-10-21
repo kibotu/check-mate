@@ -1,4 +1,5 @@
 import Foundation
+import Network
 
 /// Handler for network status checks
 ///
@@ -10,43 +11,81 @@ import Foundation
 /// - Enables web to optimize content/quality based on connection type
 ///
 /// **Design Decision:**
-/// Uses dependency injection (@CoreInject) to access the app's network
-/// availability service. This ensures consistency between native and web
-/// network state, and makes testing easier.
+/// Uses Apple's Network framework (iOS 12+) to monitor network connectivity.
+/// This provides accurate, real-time network status information including
+/// connection type detection (wifi, cellular, wired).
 ///
 /// **Connection Type Detection:**
-/// Returns the actual connection type (wifi, cellular, none, or unknown)
-/// by leveraging iOS SystemConfiguration APIs via NetworkReachabilityManager.
+/// Returns the actual connection type (wifi, cellular, wired, or none)
+/// by checking the NWPath's available interfaces. This is more reliable
+/// than older Reachability APIs and is Apple's recommended approach.
+///
+/// **Implementation Note:**
+/// Uses NWPathMonitor to get the current network state. The monitor provides
+/// a snapshot of the current path which includes both reachability status
+/// and the connection type information.
 class NetworkStatusHandler: BridgeCommand {
     let actionName = "networkState"
-    
-//    @CoreInject private var networkAvailability: NetworkAvailabilityProtocol
     
     func handle(
         content: [String: Any]?,
         completion: @escaping (Result<[String: Any]?, BridgeError>) -> Void
     ) {
-//        let networkStatus = networkAvailability.networkStatus
+        // Create a path monitor to check current network status
+        let monitor = NWPathMonitor()
+        let queue = DispatchQueue(label: "com.check24.networkstatus.monitor")
         
-//        let status: [String: Any] = [
-//            "connected": networkStatus.isReachable,
-//            "type": connectionTypeString(networkStatus.connectionType)
-//        ]
+        monitor.pathUpdateHandler = { path in
+            let isConnected = path.status == .satisfied
+            let connectionType = self.determineConnectionType(from: path)
+            
+            let status: [String: Any] = [
+                "connected": isConnected,
+                "type": connectionType
+            ]
+            
+            // Stop monitoring after getting the status
+            monitor.cancel()
+            
+            // Return the result
+            completion(.success(status))
+        }
         
-//        completion(.success(status))
+        // Start monitoring and immediately get the current status
+        monitor.start(queue: queue)
     }
     
-//    private func connectionTypeString(_ type: NetworkStatus.ConnectionType) -> String {
-//        switch type {
-//        case .none:
-//            return "none"
-//        case .unknown:
-//            return "unknown"
-//        case .wifi:
-//            return "wifi"
-//        case .cellular:
-//            return "cellular"
-//        }
-//    }
+    /// Determines the connection type from the network path
+    ///
+    /// **Priority order:**
+    /// 1. Cellular - if cellular interface is available
+    /// 2. WiFi - if wifi interface is available
+    /// 3. Wired - if wired ethernet is available
+    /// 4. None - if no connection is available
+    ///
+    /// **Why this order?**
+    /// Cellular is checked first because in multi-interface scenarios
+    /// (like Personal Hotspot), cellular is typically the actual connection
+    /// method even if wifi is technically enabled.
+    private func determineConnectionType(from path: NWPath) -> String {
+        if path.status != .satisfied {
+            return "none"
+        }
+        
+        // Check interfaces in priority order
+        if path.usesInterfaceType(.cellular) {
+            return "cellular"
+        } else if path.usesInterfaceType(.wifi) {
+            return "wifi"
+        } else if path.usesInterfaceType(.wiredEthernet) {
+            return "wired"
+        } else if path.usesInterfaceType(.loopback) {
+            // Loopback means local-only connectivity (no internet)
+            return "none"
+        } else {
+            // Other interface types (like .other) exist but are uncommon
+            return "unknown"
+        }
+    }
 }
 
