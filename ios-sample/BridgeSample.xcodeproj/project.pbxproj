@@ -8,22 +8,62 @@
 
 /* Begin PBXBuildFile section */
 		A1000001000000000000001 /* BridgeSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* BridgeSampleApp.swift */; };
-		A1000003000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* ContentView.swift */; };
-		A1000005000000000000001 /* WebViewBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* WebViewBridge.swift */; };
-		A1000007000000000000001 /* BridgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008000000000000001 /* BridgeViewController.swift */; };
-		A1000009000000000000001 /* BridgeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000010000000000000001 /* BridgeActions.swift */; };
 		A1000011000000000000001 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = A1000012000000000000001 /* index.html */; };
+		C35C0E5B2EA780C000D4D420 /* OpenSettingsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4A2EA780C000D4D420 /* OpenSettingsHandler.swift */; };
+		C35C0E5C2EA780C000D4D420 /* LoadSecureDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E472EA780C000D4D420 /* LoadSecureDataHandler.swift */; };
+		C35C0E5D2EA780C000D4D420 /* TrackEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E532EA780C000D4D420 /* TrackEventHandler.swift */; };
+		C35C0E5E2EA780C000D4D420 /* DeviceInfoHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E432EA780C000D4D420 /* DeviceInfoHandler.swift */; };
+		C35C0E5F2EA780C000D4D420 /* LifecycleEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E462EA780C000D4D420 /* LifecycleEventsHandler.swift */; };
+		C35C0E602EA780C000D4D420 /* SystemBarsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E512EA780C000D4D420 /* SystemBarsHandler.swift */; };
+		C35C0E612EA780C000D4D420 /* TopNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E522EA780C000D4D420 /* TopNavigationHandler.swift */; };
+		C35C0E622EA780C000D4D420 /* BridgeCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E562EA780C000D4D420 /* BridgeCommand.swift */; };
+		C35C0E632EA780C000D4D420 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E452EA780C000D4D420 /* KeychainHelper.swift */; };
+		C35C0E642EA780C000D4D420 /* NetworkStatusHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E492EA780C000D4D420 /* NetworkStatusHandler.swift */; };
+		C35C0E652EA780C000D4D420 /* ShowAlertHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4F2EA780C000D4D420 /* ShowAlertHandler.swift */; };
+		C35C0E662EA780C000D4D420 /* JavaScriptBridgeMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E582EA780C000D4D420 /* JavaScriptBridgeMessage.swift */; };
+		C35C0E672EA780C000D4D420 /* JavaScriptBridgeScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E592EA780C000D4D420 /* JavaScriptBridgeScript.swift */; };
+		C35C0E682EA780C000D4D420 /* CopyToClipboardHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E422EA780C000D4D420 /* CopyToClipboardHandler.swift */; };
+		C35C0E692EA780C000D4D420 /* RemoveSecureDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4D2EA780C000D4D420 /* RemoveSecureDataHandler.swift */; };
+		C35C0E6A2EA780C000D4D420 /* HapticHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E442EA780C000D4D420 /* HapticHandler.swift */; };
+		C35C0E6B2EA780C000D4D420 /* ShowToastHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E502EA780C000D4D420 /* ShowToastHandler.swift */; };
+		C35C0E6C2EA780C000D4D420 /* OpenUrlHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4B2EA780C000D4D420 /* OpenUrlHandler.swift */; };
+		C35C0E6D2EA780C000D4D420 /* RefreshHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4C2EA780C000D4D420 /* RefreshHandler.swift */; };
+		C35C0E6E2EA780C000D4D420 /* BottomNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E412EA780C000D4D420 /* BottomNavigationHandler.swift */; };
+		C35C0E6F2EA780C000D4D420 /* JavaScriptBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E572EA780C000D4D420 /* JavaScriptBridge.swift */; };
+		C35C0E702EA780C000D4D420 /* TrackScreenHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E542EA780C000D4D420 /* TrackScreenHandler.swift */; };
+		C35C0E712EA780C000D4D420 /* NavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E482EA780C000D4D420 /* NavigationHandler.swift */; };
+		C35C0E722EA780C000D4D420 /* SaveSecureDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4E2EA780C000D4D420 /* SaveSecureDataHandler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A1000002000000000000001 /* BridgeSampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeSampleApp.swift; sourceTree = "<group>"; };
-		A1000004000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A1000006000000000000001 /* WebViewBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewBridge.swift; sourceTree = "<group>"; };
-		A1000008000000000000001 /* BridgeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeViewController.swift; sourceTree = "<group>"; };
-		A1000010000000000000001 /* BridgeActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeActions.swift; sourceTree = "<group>"; };
 		A1000012000000000000001 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		A1000013000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000014000000000000001 /* BridgeSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BridgeSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C35C0E412EA780C000D4D420 /* BottomNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavigationHandler.swift; sourceTree = "<group>"; };
+		C35C0E422EA780C000D4D420 /* CopyToClipboardHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyToClipboardHandler.swift; sourceTree = "<group>"; };
+		C35C0E432EA780C000D4D420 /* DeviceInfoHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoHandler.swift; sourceTree = "<group>"; };
+		C35C0E442EA780C000D4D420 /* HapticHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticHandler.swift; sourceTree = "<group>"; };
+		C35C0E452EA780C000D4D420 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		C35C0E462EA780C000D4D420 /* LifecycleEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifecycleEventsHandler.swift; sourceTree = "<group>"; };
+		C35C0E472EA780C000D4D420 /* LoadSecureDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadSecureDataHandler.swift; sourceTree = "<group>"; };
+		C35C0E482EA780C000D4D420 /* NavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationHandler.swift; sourceTree = "<group>"; };
+		C35C0E492EA780C000D4D420 /* NetworkStatusHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStatusHandler.swift; sourceTree = "<group>"; };
+		C35C0E4A2EA780C000D4D420 /* OpenSettingsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSettingsHandler.swift; sourceTree = "<group>"; };
+		C35C0E4B2EA780C000D4D420 /* OpenUrlHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenUrlHandler.swift; sourceTree = "<group>"; };
+		C35C0E4C2EA780C000D4D420 /* RefreshHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshHandler.swift; sourceTree = "<group>"; };
+		C35C0E4D2EA780C000D4D420 /* RemoveSecureDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveSecureDataHandler.swift; sourceTree = "<group>"; };
+		C35C0E4E2EA780C000D4D420 /* SaveSecureDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSecureDataHandler.swift; sourceTree = "<group>"; };
+		C35C0E4F2EA780C000D4D420 /* ShowAlertHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAlertHandler.swift; sourceTree = "<group>"; };
+		C35C0E502EA780C000D4D420 /* ShowToastHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowToastHandler.swift; sourceTree = "<group>"; };
+		C35C0E512EA780C000D4D420 /* SystemBarsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemBarsHandler.swift; sourceTree = "<group>"; };
+		C35C0E522EA780C000D4D420 /* TopNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopNavigationHandler.swift; sourceTree = "<group>"; };
+		C35C0E532EA780C000D4D420 /* TrackEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEventHandler.swift; sourceTree = "<group>"; };
+		C35C0E542EA780C000D4D420 /* TrackScreenHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackScreenHandler.swift; sourceTree = "<group>"; };
+		C35C0E562EA780C000D4D420 /* BridgeCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeCommand.swift; sourceTree = "<group>"; };
+		C35C0E572EA780C000D4D420 /* JavaScriptBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScriptBridge.swift; sourceTree = "<group>"; };
+		C35C0E582EA780C000D4D420 /* JavaScriptBridgeMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScriptBridgeMessage.swift; sourceTree = "<group>"; };
+		C35C0E592EA780C000D4D420 /* JavaScriptBridgeScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScriptBridgeScript.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,10 +88,9 @@
 		A1000017000000000000001 /* BridgeSample */ = {
 			isa = PBXGroup;
 			children = (
+				C35C0E5A2EA780C000D4D420 /* Bridge */,
 				A1000013000000000000001 /* Info.plist */,
 				A1000002000000000000001 /* BridgeSampleApp.swift */,
-				A1000004000000000000001 /* ContentView.swift */,
-				A1000019000000000000001 /* Bridge */,
 				A1000020000000000000001 /* Resources */,
 			);
 			path = BridgeSample;
@@ -65,22 +104,51 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A1000019000000000000001 /* Bridge */ = {
-			isa = PBXGroup;
-			children = (
-				A1000006000000000000001 /* WebViewBridge.swift */,
-				A1000008000000000000001 /* BridgeViewController.swift */,
-				A1000010000000000000001 /* BridgeActions.swift */,
-			);
-			path = Bridge;
-			sourceTree = "<group>";
-		};
 		A1000020000000000000001 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				A1000012000000000000001 /* index.html */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		C35C0E552EA780C000D4D420 /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				C35C0E412EA780C000D4D420 /* BottomNavigationHandler.swift */,
+				C35C0E422EA780C000D4D420 /* CopyToClipboardHandler.swift */,
+				C35C0E432EA780C000D4D420 /* DeviceInfoHandler.swift */,
+				C35C0E442EA780C000D4D420 /* HapticHandler.swift */,
+				C35C0E452EA780C000D4D420 /* KeychainHelper.swift */,
+				C35C0E462EA780C000D4D420 /* LifecycleEventsHandler.swift */,
+				C35C0E472EA780C000D4D420 /* LoadSecureDataHandler.swift */,
+				C35C0E482EA780C000D4D420 /* NavigationHandler.swift */,
+				C35C0E492EA780C000D4D420 /* NetworkStatusHandler.swift */,
+				C35C0E4A2EA780C000D4D420 /* OpenSettingsHandler.swift */,
+				C35C0E4B2EA780C000D4D420 /* OpenUrlHandler.swift */,
+				C35C0E4C2EA780C000D4D420 /* RefreshHandler.swift */,
+				C35C0E4D2EA780C000D4D420 /* RemoveSecureDataHandler.swift */,
+				C35C0E4E2EA780C000D4D420 /* SaveSecureDataHandler.swift */,
+				C35C0E4F2EA780C000D4D420 /* ShowAlertHandler.swift */,
+				C35C0E502EA780C000D4D420 /* ShowToastHandler.swift */,
+				C35C0E512EA780C000D4D420 /* SystemBarsHandler.swift */,
+				C35C0E522EA780C000D4D420 /* TopNavigationHandler.swift */,
+				C35C0E532EA780C000D4D420 /* TrackEventHandler.swift */,
+				C35C0E542EA780C000D4D420 /* TrackScreenHandler.swift */,
+			);
+			path = Commands;
+			sourceTree = "<group>";
+		};
+		C35C0E5A2EA780C000D4D420 /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				C35C0E552EA780C000D4D420 /* Commands */,
+				C35C0E562EA780C000D4D420 /* BridgeCommand.swift */,
+				C35C0E572EA780C000D4D420 /* JavaScriptBridge.swift */,
+				C35C0E582EA780C000D4D420 /* JavaScriptBridgeMessage.swift */,
+				C35C0E592EA780C000D4D420 /* JavaScriptBridgeScript.swift */,
+			);
+			path = Bridge;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -122,6 +190,8 @@
 				Base,
 			);
 			mainGroup = A1000016000000000000001;
+			packageReferences = (
+			);
 			productRefGroup = A1000018000000000000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -148,10 +218,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001000000000000001 /* BridgeSampleApp.swift in Sources */,
-				A1000003000000000000001 /* ContentView.swift in Sources */,
-				A1000005000000000000001 /* WebViewBridge.swift in Sources */,
-				A1000007000000000000001 /* BridgeViewController.swift in Sources */,
-				A1000009000000000000001 /* BridgeActions.swift in Sources */,
+				C35C0E5B2EA780C000D4D420 /* OpenSettingsHandler.swift in Sources */,
+				C35C0E5C2EA780C000D4D420 /* LoadSecureDataHandler.swift in Sources */,
+				C35C0E5D2EA780C000D4D420 /* TrackEventHandler.swift in Sources */,
+				C35C0E5E2EA780C000D4D420 /* DeviceInfoHandler.swift in Sources */,
+				C35C0E5F2EA780C000D4D420 /* LifecycleEventsHandler.swift in Sources */,
+				C35C0E602EA780C000D4D420 /* SystemBarsHandler.swift in Sources */,
+				C35C0E612EA780C000D4D420 /* TopNavigationHandler.swift in Sources */,
+				C35C0E622EA780C000D4D420 /* BridgeCommand.swift in Sources */,
+				C35C0E632EA780C000D4D420 /* KeychainHelper.swift in Sources */,
+				C35C0E642EA780C000D4D420 /* NetworkStatusHandler.swift in Sources */,
+				C35C0E652EA780C000D4D420 /* ShowAlertHandler.swift in Sources */,
+				C35C0E662EA780C000D4D420 /* JavaScriptBridgeMessage.swift in Sources */,
+				C35C0E672EA780C000D4D420 /* JavaScriptBridgeScript.swift in Sources */,
+				C35C0E682EA780C000D4D420 /* CopyToClipboardHandler.swift in Sources */,
+				C35C0E692EA780C000D4D420 /* RemoveSecureDataHandler.swift in Sources */,
+				C35C0E6A2EA780C000D4D420 /* HapticHandler.swift in Sources */,
+				C35C0E6B2EA780C000D4D420 /* ShowToastHandler.swift in Sources */,
+				C35C0E6C2EA780C000D4D420 /* OpenUrlHandler.swift in Sources */,
+				C35C0E6D2EA780C000D4D420 /* RefreshHandler.swift in Sources */,
+				C35C0E6E2EA780C000D4D420 /* BottomNavigationHandler.swift in Sources */,
+				C35C0E6F2EA780C000D4D420 /* JavaScriptBridge.swift in Sources */,
+				C35C0E702EA780C000D4D420 /* TrackScreenHandler.swift in Sources */,
+				C35C0E712EA780C000D4D420 /* NavigationHandler.swift in Sources */,
+				C35C0E722EA780C000D4D420 /* SaveSecureDataHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,7 +262,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -200,7 +290,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -353,4 +443,3 @@
 	};
 	rootObject = A1000025000000000000001 /* Project object */;
 }
-

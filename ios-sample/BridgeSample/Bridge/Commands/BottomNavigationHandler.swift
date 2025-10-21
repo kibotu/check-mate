@@ -33,7 +33,7 @@ class BottomNavigationHandler: BridgeCommand {
         }
         
         DispatchQueue.main.async {
-            CorePlugin.api.bottomNavigationService.configure(with: BottomNavigationConfig(isVisible: isVisible))
+//            CorePlugin.api.bottomNavigationService.configure(with: BottomNavigationConfig(isVisible: isVisible))
             completion(.success(nil))
         }
     }

@@ -25,7 +25,7 @@ class DeviceInfoHandler: BridgeCommand {
             "sdkVersion": getSDKVersion(), // Compile-time SDK version
             "manufacturer": "Apple",
             "model": getDeviceIdentifier(),
-            "appVersion": Bundle.main.shortVersion ?? "Unknown"
+//            "appVersion": Bundle.main.shortVersion ?? "Unknown"
         ]
         
         completion(.success(deviceInfo))

@@ -28,7 +28,7 @@ class SystemBarsHandler: BridgeCommand {
         // iOS doesn't allow programmatic control of status bar visibility from UIViewController
         // This would need to be handled at the app level with Info.plist settings
         // For now, we acknowledge the command without errors to maintain cross-platform compatibility
-        Orchard.d("[Bridge] System bars command received (limited support on iOS)")
+        print("[Bridge] System bars command received (limited support on iOS)")
         completion(.success(nil))
     }
 }

@@ -20,33 +20,33 @@ import Foundation
 class NetworkStatusHandler: BridgeCommand {
     let actionName = "networkState"
     
-    @CoreInject private var networkAvailability: NetworkAvailabilityProtocol
+//    @CoreInject private var networkAvailability: NetworkAvailabilityProtocol
     
     func handle(
         content: [String: Any]?,
         completion: @escaping (Result<[String: Any]?, BridgeError>) -> Void
     ) {
-        let networkStatus = networkAvailability.networkStatus
+//        let networkStatus = networkAvailability.networkStatus
         
-        let status: [String: Any] = [
-            "connected": networkStatus.isReachable,
-            "type": connectionTypeString(networkStatus.connectionType)
-        ]
+//        let status: [String: Any] = [
+//            "connected": networkStatus.isReachable,
+//            "type": connectionTypeString(networkStatus.connectionType)
+//        ]
         
-        completion(.success(status))
+//        completion(.success(status))
     }
     
-    private func connectionTypeString(_ type: NetworkStatus.ConnectionType) -> String {
-        switch type {
-        case .none:
-            return "none"
-        case .unknown:
-            return "unknown"
-        case .wifi:
-            return "wifi"
-        case .cellular:
-            return "cellular"
-        }
-    }
+//    private func connectionTypeString(_ type: NetworkStatus.ConnectionType) -> String {
+//        switch type {
+//        case .none:
+//            return "none"
+//        case .unknown:
+//            return "unknown"
+//        case .wifi:
+//            return "wifi"
+//        case .cellular:
+//            return "cellular"
+//        }
+//    }
 }
 

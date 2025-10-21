@@ -23,14 +23,14 @@ import Foundation
 class RefreshHandler: BridgeCommand {
     let actionName = "refresh"
     
-    @CoreInject var refreshService: RefreshService
+//    @CoreInject var refreshService: RefreshService
     
     func handle(
         content: [String: Any]?,
         completion: @escaping (Result<[String: Any]?, BridgeError>) -> Void
     ) {
-        let appLink = PluginController.createAppLink(from:  "https://experts.check24.de/refresh".url!, source: .pushNotification(isSilent: true))
-        refreshService.onRefresh(appLink: appLink)
+//        let appLink = PluginController.createAppLink(from:  "https://experts.check24.de/refresh".url!, source: .pushNotification(isSilent: true))
+//        refreshService.onRefresh(appLink: appLink)
         completion(.success(nil))
     }
 }

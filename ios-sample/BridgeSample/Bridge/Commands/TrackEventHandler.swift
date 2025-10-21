@@ -31,11 +31,11 @@ class TrackEventHandler: BridgeCommand {
         
         let params = content?["params"] as? [String: Any] ?? [:]
         
-        // Track event using C24Tracker (forwards to Firebase Analytics)
+//        // Track event using C24Tracker (forwards to Firebase Analytics)
         let trackingEvent = BridgeTrackingEvent(name: event, parameters: params)
-        C24Tracker.event(trackingEvent)
+//        C24Tracker.event(trackingEvent)
         
-        Orchard.d("[Bridge] Track event: \(event) with params: \(params)")
+        print("[Bridge] Track event: \(event) with params: \(params)")
         
         // Fire-and-forget: immediately return success
         completion(.success(nil))
@@ -48,3 +48,7 @@ private struct BridgeTrackingEvent: TrackingEvent {
     let parameters: [String: Any]
 }
 
+public protocol TrackingEvent {
+    var name: String { get }
+    var parameters: [String: Any] { get }
+}

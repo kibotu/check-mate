@@ -59,9 +59,9 @@ class NavigationHandler: BridgeCommand {
                 // Open in external browser
                 UIApplication.shared.open(url)
             } else {
-                // Open internally using AppLinkRouter
-                let appLinkRouter: AppLinkRouter = resolve()
-                appLinkRouter.open(url: url, from: .deepLink)
+//                // Open internally using AppLinkRouter
+//                let appLinkRouter: AppLinkRouter = resolve()
+//                appLinkRouter.open(url: url, from: .deepLink)
             }
             completion(.success(nil))
         }

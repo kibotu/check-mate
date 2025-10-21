@@ -43,9 +43,9 @@ class TrackScreenHandler: BridgeCommand {
             name: "screen_view",
             parameters: parameters
         )
-        C24Tracker.event(trackingEvent)
+//        C24Tracker.event(trackingEvent)
         
-        Orchard.d("[Bridge] Track screen: \(screenName), class: \(String(describing: screenClass))")
+        print("[Bridge] Track screen: \(screenName), class: \(String(describing: screenClass))")
         
         // Fire-and-forget: immediately return success
         completion(.success(nil))

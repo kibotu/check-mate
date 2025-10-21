@@ -27,13 +27,13 @@ class OpenSettingsHandler: BridgeCommand {
     ) {
         DispatchQueue.main.async {
             guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                Orchard.e("Could not create settings URL", [:])
+                print("Could not create settings URL", [:])
                 completion(.failure(.internalError("Could not create settings URL")))
                 return
             }
             
             guard UIApplication.shared.canOpenURL(settingsUrl) else {
-                Orchard.e("Cannot open settings URL", ["url": settingsUrl])
+                print("Cannot open settings URL", ["url": settingsUrl])
                 completion(.failure(.internalError("Cannot open settings URL")))
                 return
             }
@@ -42,7 +42,7 @@ class OpenSettingsHandler: BridgeCommand {
                 if success {
                     completion(.success(nil))
                 } else {
-                    Orchard.e("Failed to open settings", [:])
+                    print("Failed to open settings", [:])
                     completion(.failure(.internalError("Failed to open settings")))
                 }
             }

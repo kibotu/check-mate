@@ -35,38 +35,38 @@ class TopNavigationHandler: BridgeCommand {
             return
         }
         
-        DispatchQueue.main.async {
-            let topNavService: TopNavigationService = resolve()
-            
-            var config = TopNavigationConfig()
-            
-            if let isVisible = content["isVisible"] as? Bool {
-                config.isVisible = isVisible
-            }
-            
-            if let title = content["title"] as? String {
-                config.title = title
-            }
-            
-            if let showUpArrow = content["showUpArrow"] as? Bool {
-                config.showBackButton = showUpArrow
-            }
-            
-            if let showDivider = content["showDivider"] as? Bool {
-                config.showDivider = showDivider
-            }
-            
-            if let showLogo = content["showLogo"] as? Bool {
-                config.showLogo = showLogo
-            }
-            
-            if let showProfileIconWidget = content["showProfileIconWidget"] as? Bool {
-                config.showProfileIconWidget = showProfileIconWidget
-            }
-            
-            topNavService.configure(with: config)
+//        DispatchQueue.main.async {
+//            let topNavService: TopNavigationService = resolve()
+//            
+//            var config = TopNavigationConfig()
+//            
+//            if let isVisible = content["isVisible"] as? Bool {
+//                config.isVisible = isVisible
+//            }
+//            
+//            if let title = content["title"] as? String {
+//                config.title = title
+//            }
+//            
+//            if let showUpArrow = content["showUpArrow"] as? Bool {
+//                config.showBackButton = showUpArrow
+//            }
+//            
+//            if let showDivider = content["showDivider"] as? Bool {
+//                config.showDivider = showDivider
+//            }
+//            
+//            if let showLogo = content["showLogo"] as? Bool {
+//                config.showLogo = showLogo
+//            }
+//            
+//            if let showProfileIconWidget = content["showProfileIconWidget"] as? Bool {
+//                config.showProfileIconWidget = showProfileIconWidget
+//            }
+//            
+//            topNavService.configure(with: config)
             completion(.success(nil))
-        }
+//        }
     }
 }
 

@@ -32,7 +32,7 @@ class LifecycleEventsHandler: BridgeCommand {
         
         bridge?.lifecycleEventsEnabled = enable
         
-        Orchard.d("[Bridge] Lifecycle events \(enable ? "enabled" : "disabled")")
+        print("[Bridge] Lifecycle events \(enable ? "enabled" : "disabled")")
         completion(.success(nil))
     }
 }

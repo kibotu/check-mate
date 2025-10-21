@@ -21,7 +21,7 @@ import WebKit
 class JavaScriptBridge: NSObject, WKScriptMessageHandler {
     private var handlers: [BridgeCommand] = []
     private weak var webView: WKWebView?
-    private weak var viewController: CoreWebViewController?
+    private weak var viewController: UIViewController?
     
     let name = "bridge"
     
@@ -41,7 +41,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
     /// - Gives web developers explicit control over when to start receiving events
     var lifecycleEventsEnabled = false
     
-    init(webView: WKWebView, viewController: CoreWebViewController) {
+    init(webView: WKWebView, viewController: UIViewController) {
         self.webView = webView
         self.viewController = viewController
         super.init()
@@ -125,7 +125,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
     /// - Allows future enhancement: multiple handlers per action if needed
     private func register(handler: BridgeCommand) {
         handlers.append(handler)
-        Orchard.d("[Bridge] Registered handler for action: \(handler.actionName)")
+        print("[Bridge] Registered handler for action: \(handler.actionName)")
     }
     
     /// Get handler for the given action
@@ -162,7 +162,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         
         webView?.configuration.userContentController.addUserScript(userScript)
         
-        Orchard.d("[Bridge] Bridge script injected (schema version \(schemaVersion))")
+        print("[Bridge] Bridge script injected (schema version \(schemaVersion))")
     }
     
     // MARK: - WKScriptMessageHandler
@@ -181,7 +181,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         guard message.name == name else { return }
         
         guard let body = message.body as? String else {
-            Orchard.w("[Bridge] Received invalid message body")
+            print("[Bridge] Received invalid message body")
             return
         }
         
@@ -204,21 +204,21 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
     /// to send a response that nothing can receive.
     private func handleMessage(_ messageString: String) {
         guard let data = messageString.data(using: .utf8) else {
-            Orchard.w("[Bridge] Could not convert message to data")
+            print("[Bridge] Could not convert message to data")
             return
         }
         
         let decoder = JSONDecoder()
         
         guard let message = try? decoder.decode(JavaScriptBridgeMessage.self, from: data) else {
-            Orchard.w("[Bridge] Could not decode message: \(messageString)")
+            print("[Bridge] Could not decode message: \(messageString)")
             sendError(id: "unknown", error: .invalidMessage)
             return
         }
         
         // Check schema version
         if !isVersionSupported(message.version) {
-            Orchard.d("[Bridge] Silently ignoring unsupported version: \(message.version)")
+            print("[Bridge] Silently ignoring unsupported version: \(message.version)")
             // Silently ignore messages with unsupported versions (as per spec)
             return
         }
@@ -226,10 +226,10 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         let action = message.data.action
         let content = message.data.content?.mapValues { $0.value }
         
-        Orchard.d("[Bridge] Received action: \(action)")
+        print("[Bridge] Received action: \(action)")
         
         guard let handler = handler(for: action) else {
-            Orchard.w("[Bridge] Unknown action: \(action)")
+            print("[Bridge] Unknown action: \(action)")
             sendError(id: message.id, error: .unknownAction(action))
             return
         }
@@ -290,7 +290,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         
         guard let data = try? encoder.encode(response),
               let jsonString = String(data: data, encoding: .utf8) else {
-            Orchard.e("Failed to encode bridge response", [:])
+            print("Failed to encode bridge response", [:])
             return
         }
         
@@ -299,7 +299,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         DispatchQueue.main.async { [weak self] in
             self?.webView?.evaluateJavaScript(script) { _, error in
                 if let error = error {
-                    Orchard.e("Failed to send bridge response: \(error)", [:])
+                    print("Failed to send bridge response: \(error)", [:])
                 }
             }
         }
@@ -330,7 +330,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: message),
               let jsonString = String(data: jsonData, encoding: .utf8) else {
-            Orchard.e("Failed to serialize message to web", [:])
+            print("Failed to serialize message to web", [:])
             return
         }
         
@@ -339,7 +339,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         DispatchQueue.main.async { [weak self] in
             self?.webView?.evaluateJavaScript(script) { _, error in
                 if let error = error {
-                    Orchard.e("Failed to send message to web: \(error)", [:])
+                    print("Failed to send message to web: \(error)", [:])
                 }
             }
         }
