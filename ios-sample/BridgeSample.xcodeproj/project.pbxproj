@@ -11,6 +11,7 @@
 		A1000011000000000000001 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = A1000012000000000000001 /* index.html */; };
 		A1000031000000000000001 /* TopNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000032000000000000001 /* TopNavigationView.swift */; };
 		A1000033000000000000001 /* BottomNavigationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000034000000000000001 /* BottomNavigationService.swift */; };
+		A1000034100000000000001 /* TabNavigationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000034200000000000001 /* TabNavigationService.swift */; };
 		A1000035000000000000001 /* WebViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000036000000000000001 /* WebViewContainer.swift */; };
 		A1000037000000000000001 /* WebViewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000038000000000000001 /* WebViewScreen.swift */; };
 		A1000039000000000000001 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000040000000000000001 /* MainTabView.swift */; };
@@ -47,6 +48,7 @@
 		A1000014000000000000001 /* BridgeSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BridgeSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000032000000000000001 /* TopNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopNavigationView.swift; sourceTree = "<group>"; };
 		A1000034000000000000001 /* BottomNavigationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavigationService.swift; sourceTree = "<group>"; };
+		A1000034200000000000001 /* TabNavigationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabNavigationService.swift; sourceTree = "<group>"; };
 		A1000036000000000000001 /* WebViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainer.swift; sourceTree = "<group>"; };
 		A1000038000000000000001 /* WebViewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewScreen.swift; sourceTree = "<group>"; };
 		A1000040000000000000001 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 			children = (
 				C35C0E412EA780C000D4D420 /* BottomNavigationHandler.swift */,
 				A1000034000000000000001 /* BottomNavigationService.swift */,
+				A1000034200000000000001 /* TabNavigationService.swift */,
 			);
 			path = bottomnavigation;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				A1000001000000000000001 /* BridgeSampleApp.swift in Sources */,
 				A1000031000000000000001 /* TopNavigationView.swift in Sources */,
 				A1000033000000000000001 /* BottomNavigationService.swift in Sources */,
+				A1000034100000000000001 /* TabNavigationService.swift in Sources */,
 				A1000035000000000000001 /* WebViewContainer.swift in Sources */,
 				A1000037000000000000001 /* WebViewScreen.swift in Sources */,
 				A1000039000000000000001 /* MainTabView.swift in Sources */,

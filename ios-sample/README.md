@@ -97,7 +97,7 @@ ios-sample/
 
 ## Key Differences from Android
 
-1. **System Bars**: iOS doesn't support hiding status bar/navigation in the same way as Android
+1. **System Bars**: iOS implementation uses SwiftUI's `.statusBarHidden()` modifier with reactive state management
 2. **Toast**: iOS uses native alerts instead of Android-style toasts
 3. **WebView**: Uses WKWebView instead of Android WebView
 4. **Navigation**: SwiftUI-based tab navigation instead of Compose Navigation
@@ -124,11 +124,12 @@ Open the app and interact with the bridge demo page:
 
 ### Why Singleton Services?
 
-`TopNavigationService.shared` and `BottomNavigationService.shared` provide:
-- Single source of truth for navigation state
+`TopNavigationService.shared`, `BottomNavigationService.shared`, and `SystemUIState.shared` provide:
+- Single source of truth for UI state
 - Easy access from bridge handlers
 - Observable state changes via `@Published`
 - No need for complex dependency injection
+- Reactive UI updates across the app
 
 ### Why UIViewRepresentable for WebView?
 

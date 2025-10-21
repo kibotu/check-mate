@@ -2,10 +2,11 @@ import SwiftUI
 
 /// Main tab view with bottom navigation
 struct MainTabView: View {
-    @State private var selectedTab = 0
     @State private var currentBridge: JavaScriptBridge?
     @ObservedObject private var bottomNavService = BottomNavigationService.shared
     @ObservedObject private var topNavService = TopNavigationService.shared
+    @ObservedObject private var tabNavService = TabNavigationService.shared
+    @ObservedObject private var systemUIState = SystemUIState.shared
     
     var body: some View {
         VStack(spacing: 0) {
@@ -17,7 +18,7 @@ struct MainTabView: View {
             // Content
             ZStack {
                 // Tab 1 - Bridge Demo
-                if selectedTab == 0 {
+                if tabNavService.selectedTab == 0 {
                     WebViewScreen(
                         url: getLocalFileURL(filename: "index.html"),
                         onBridgeReady: { bridge in
@@ -30,7 +31,7 @@ struct MainTabView: View {
                 }
                 
                 // Tab 2 - External Website
-                if selectedTab == 1 {
+                if tabNavService.selectedTab == 1 {
                     WebViewScreen(
                         url: URL(string: "https://portfolio.kibotu.net/")!,
                         onBridgeReady: { bridge in
@@ -53,22 +54,18 @@ struct MainTabView: View {
                         TabBarItem(
                             icon: "house.fill",
                             label: "Home",
-                            isSelected: selectedTab == 0
+                            isSelected: tabNavService.selectedTab == 0
                         ) {
-                            withAnimation {
-                                selectedTab = 0
-                            }
+                            tabNavService.switchToTab(0)
                         }
                         
                         // Tab 2 - Web
                         TabBarItem(
                             icon: "globe",
                             label: "Web",
-                            isSelected: selectedTab == 1
+                            isSelected: tabNavService.selectedTab == 1
                         ) {
-                            withAnimation {
-                                selectedTab = 1
-                            }
+                            tabNavService.switchToTab(1)
                         }
                     }
                     .frame(height: 50)
@@ -78,6 +75,7 @@ struct MainTabView: View {
             }
         }
         .edgesIgnoringSafeArea(.bottom)
+        .statusBarHidden(systemUIState.isStatusBarHidden)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             currentBridge?.notifyLifecycleEvent("focused")
         }

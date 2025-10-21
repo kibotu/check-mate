@@ -95,9 +95,10 @@ class NavigationHandler: BridgeCommand {
                     UIApplication.shared.open(url)
                     completion(.success(nil))
                 } else {
-                    // Open internally using AppLinkRouter (commented out for now)
-                    // let appLinkRouter: AppLinkRouter = resolve()
-                    // appLinkRouter.open(url: url, from: .deepLink)
+                    // Internal navigation - switch to tab 2 (Web tab)
+                    // This demonstrates internal app navigation triggered by the web content
+                    print("[NavigationHandler] Internal navigation to: \(urlString)")
+                    TabNavigationService.shared.switchToTab(1)
                     completion(.success(nil))
                 }
                 return
