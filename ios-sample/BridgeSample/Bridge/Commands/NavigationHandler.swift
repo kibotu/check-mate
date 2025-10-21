@@ -1,69 +1,110 @@
 import Foundation
 import UIKit
+import WebKit
 
-/// Handler for in-app and external navigation
+/// Handles multiple navigation patterns: back navigation, internal/external URLs.
 ///
-/// **Why let web control navigation?**
-/// - Web content needs to navigate to native screens for seamless UX
-/// - Web needs to open external links in system browser for better UX
-/// - Web needs programmatic "back" navigation for custom flows
+/// **Why combined command:**
+/// Navigation actions are mutually exclusive - user does one at a time. Single command
+/// simplifies web API (one call instead of multiple) for common navigation patterns.
 ///
-/// **Design Decision:**
-/// Supports three navigation patterns:
-/// 1. **Go Back**: Pops navigation stack (mimics browser back button)
-/// 2. **Internal Navigation**: Uses AppLinkRouter for native screen navigation
-/// 3. **External Navigation**: Opens URLs in system browser (Safari)
+/// **Why goBack:**
+/// Allows web to trigger native back navigation. Priority order:
+/// 1. WebView history (if available)
+/// 2. Navigation controller pop (if in a stack)
+/// 3. Dismiss view controller (if presented modally)
+/// 4. Exit app (as last resort on root view controller)
 ///
-/// **Why distinguish internal vs external?**
-/// - Internal navigation keeps users in the app (better retention)
-/// - External navigation is needed for links to websites/other apps
-/// - Gives web content control over the user experience
+/// **Why external option:**
+/// Some URLs should open in browser (privacy policies, external sites) to make
+/// clear they're leaving the app. External prevents deep link interception.
+///
+/// **Thread Safety:**
+/// All UIKit operations must run on the main thread, hence the DispatchQueue.main.async
 class NavigationHandler: BridgeCommand {
     let actionName = "navigation"
     
     weak var viewController: UIViewController?
+    weak var webView: WKWebView?
     
-    init(viewController: UIViewController?) {
+    init(viewController: UIViewController?, webView: WKWebView? = nil) {
         self.viewController = viewController
+        self.webView = webView
     }
     
     func handle(
         content: [String: Any]?,
         completion: @escaping (Result<[String: Any]?, BridgeError>) -> Void
     ) {
-        guard let content = content else {
-            completion(.failure(.invalidParameter("content")))
-            return
-        }
+        let urlString = content?["url"] as? String ?? ""
+        let isExternal = content?["external"] as? Bool ?? false
+        let goBack = content?["goBack"] as? Bool ?? false
         
-        // Handle go back
-        if let goBack = content["goBack"] as? Bool, goBack {
-            DispatchQueue.main.async { [weak self] in
-                self?.viewController?.navigationController?.popViewController(animated: true)
-                completion(.success(nil))
-            }
-            return
-        }
-        
-        // Handle URL navigation
-        guard let urlString = content["url"] as? String,
-              let url = URL(string: urlString) else {
-            completion(.failure(.invalidParameter("url")))
-            return
-        }
-        
-        let isExternal = content["external"] as? Bool ?? false
+        print("[NavigationHandler] url=\(urlString) external=\(isExternal) goBack=\(goBack)")
         
         DispatchQueue.main.async { [weak self] in
-            if isExternal {
-                // Open in external browser
-                UIApplication.shared.open(url)
-            } else {
-//                // Open internally using AppLinkRouter
-//                let appLinkRouter: AppLinkRouter = resolve()
-//                appLinkRouter.open(url: url, from: .deepLink)
+            guard let self = self else {
+                completion(.failure(.internalError("Handler deallocated")))
+                return
             }
-            completion(.success(nil))
+            
+            // Handle go back - mimics native back swipe gesture
+            if goBack {
+                // Strategy 1: Try WebView back navigation if there's history
+                if let webView = self.webView, webView.canGoBack {
+                    webView.goBack()
+                    print("[NavigationHandler] Navigated back in WebView history")
+                    completion(.success(nil))
+                    return
+                }
+                
+                // Strategy 2: Try to pop the navigation controller if we're in a navigation stack
+                if let navigationController = self.viewController?.navigationController,
+                   navigationController.viewControllers.count > 1 {
+                    navigationController.popViewController(animated: true)
+                    print("[NavigationHandler] Popped navigation controller")
+                    completion(.success(nil))
+                    return
+                }
+                
+                // Strategy 3: Try dismissing if presented modally
+                if let viewController = self.viewController,
+                   viewController.presentingViewController != nil {
+                    viewController.dismiss(animated: true) {
+                        print("[NavigationHandler] Dismissed modal view controller")
+                        completion(.success(nil))
+                    }
+                    return
+                }
+                
+                // Strategy 4: Last resort - exit the app (iOS doesn't encourage this, but it's what the user requested)
+                // Note: This will cause the app to exit, which is against Apple's HIG but matches Android behavior
+                print("[NavigationHandler] No back navigation available, exiting app")
+                exit(0)
+            }
+            
+            // Handle URL navigation
+            if !urlString.isEmpty {
+                guard let url = URL(string: urlString) else {
+                    completion(.failure(.invalidParameter("Invalid URL: \(urlString)")))
+                    return
+                }
+                
+                if isExternal {
+                    // Open in external browser (Safari)
+                    UIApplication.shared.open(url)
+                    completion(.success(nil))
+                } else {
+                    // Open internally using AppLinkRouter (commented out for now)
+                    // let appLinkRouter: AppLinkRouter = resolve()
+                    // appLinkRouter.open(url: url, from: .deepLink)
+                    completion(.success(nil))
+                }
+                return
+            }
+            
+            // No valid navigation parameter provided
+            completion(.failure(.invalidParameter("Missing navigation parameter")))
         }
     }
 }

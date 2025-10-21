@@ -95,7 +95,7 @@ class JavaScriptBridge: NSObject, WKScriptMessageHandler {
         // Navigation
         register(handler: TopNavigationHandler())
         register(handler: BottomNavigationHandler())
-        register(handler: NavigationHandler(viewController: viewController))
+        register(handler: NavigationHandler(viewController: viewController, webView: webView))
         register(handler: OpenUrlHandler())
         
         // System
