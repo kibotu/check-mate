@@ -33,7 +33,7 @@ class TrackEventHandler: BridgeCommand {
         
 //        // Track event using C24Tracker (forwards to Firebase Analytics)
         let trackingEvent = BridgeTrackingEvent(name: event, parameters: params)
-//        C24Tracker.event(trackingEvent)
+        print(trackingEvent)
         
         print("[Bridge] Track event: \(event) with params: \(params)")
         

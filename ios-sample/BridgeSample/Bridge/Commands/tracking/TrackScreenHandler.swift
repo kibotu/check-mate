@@ -43,7 +43,7 @@ class TrackScreenHandler: BridgeCommand {
             name: "screen_view",
             parameters: parameters
         )
-//        C24Tracker.event(trackingEvent)
+        print(trackingEvent)
         
         print("[Bridge] Track screen: \(screenName), class: \(String(describing: screenClass))")
         

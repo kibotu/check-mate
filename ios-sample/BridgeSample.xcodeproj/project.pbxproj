@@ -126,8 +126,6 @@
 		A1000041000000000000001 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A1000032000000000000001 /* TopNavigationView.swift */,
-				A1000034000000000000001 /* BottomNavigationService.swift */,
 				A1000036000000000000001 /* WebViewContainer.swift */,
 				A1000038000000000000001 /* WebViewScreen.swift */,
 				A1000040000000000000001 /* MainTabView.swift */,
@@ -138,26 +136,22 @@
 		C35C0E552EA780C000D4D420 /* Commands */ = {
 			isa = PBXGroup;
 			children = (
-				C35C0E412EA780C000D4D420 /* BottomNavigationHandler.swift */,
+				C35C0E792EA7880C00D4D420 /* storage */,
+				C35C0E782EA7880300D4D420 /* tracking */,
+				C35C0E772EA787C000D4D420 /* bottomnavigation */,
+				C35C0E762EA787B500D4D420 /* topnavigation */,
 				C35C0E422EA780C000D4D420 /* CopyToClipboardHandler.swift */,
 				C35C0E432EA780C000D4D420 /* DeviceInfoHandler.swift */,
 				C35C0E442EA780C000D4D420 /* HapticHandler.swift */,
-				C35C0E452EA780C000D4D420 /* KeychainHelper.swift */,
 				C35C0E462EA780C000D4D420 /* LifecycleEventsHandler.swift */,
-				C35C0E472EA780C000D4D420 /* LoadSecureDataHandler.swift */,
 				C35C0E482EA780C000D4D420 /* NavigationHandler.swift */,
 				C35C0E492EA780C000D4D420 /* NetworkStatusHandler.swift */,
 				C35C0E4A2EA780C000D4D420 /* OpenSettingsHandler.swift */,
 				C35C0E4B2EA780C000D4D420 /* OpenUrlHandler.swift */,
 				C35C0E4C2EA780C000D4D420 /* RefreshHandler.swift */,
-				C35C0E4D2EA780C000D4D420 /* RemoveSecureDataHandler.swift */,
-				C35C0E4E2EA780C000D4D420 /* SaveSecureDataHandler.swift */,
 				C35C0E4F2EA780C000D4D420 /* ShowAlertHandler.swift */,
 				C35C0E502EA780C000D4D420 /* ShowToastHandler.swift */,
 				C35C0E512EA780C000D4D420 /* SystemBarsHandler.swift */,
-				C35C0E522EA780C000D4D420 /* TopNavigationHandler.swift */,
-				C35C0E532EA780C000D4D420 /* TrackEventHandler.swift */,
-				C35C0E542EA780C000D4D420 /* TrackScreenHandler.swift */,
 			);
 			path = Commands;
 			sourceTree = "<group>";
@@ -172,6 +166,44 @@
 				C35C0E592EA780C000D4D420 /* JavaScriptBridgeScript.swift */,
 			);
 			path = Bridge;
+			sourceTree = "<group>";
+		};
+		C35C0E762EA787B500D4D420 /* topnavigation */ = {
+			isa = PBXGroup;
+			children = (
+				C35C0E522EA780C000D4D420 /* TopNavigationHandler.swift */,
+				A1000032000000000000001 /* TopNavigationView.swift */,
+			);
+			path = topnavigation;
+			sourceTree = "<group>";
+		};
+		C35C0E772EA787C000D4D420 /* bottomnavigation */ = {
+			isa = PBXGroup;
+			children = (
+				C35C0E412EA780C000D4D420 /* BottomNavigationHandler.swift */,
+				A1000034000000000000001 /* BottomNavigationService.swift */,
+			);
+			path = bottomnavigation;
+			sourceTree = "<group>";
+		};
+		C35C0E782EA7880300D4D420 /* tracking */ = {
+			isa = PBXGroup;
+			children = (
+				C35C0E532EA780C000D4D420 /* TrackEventHandler.swift */,
+				C35C0E542EA780C000D4D420 /* TrackScreenHandler.swift */,
+			);
+			path = tracking;
+			sourceTree = "<group>";
+		};
+		C35C0E792EA7880C00D4D420 /* storage */ = {
+			isa = PBXGroup;
+			children = (
+				C35C0E472EA780C000D4D420 /* LoadSecureDataHandler.swift */,
+				C35C0E4D2EA780C000D4D420 /* RemoveSecureDataHandler.swift */,
+				C35C0E4E2EA780C000D4D420 /* SaveSecureDataHandler.swift */,
+				C35C0E452EA780C000D4D420 /* KeychainHelper.swift */,
+			);
+			path = storage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
