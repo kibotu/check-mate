@@ -12,8 +12,10 @@ import com.check24.bridgesample.bridge.commands.systembars.isLightNavigationBar
 import com.check24.bridgesample.bridge.commands.systembars.isLightStatusBar
 import com.check24.bridgesample.misc.weak
 import com.check24.bridgesample.ui.Screen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
 
@@ -39,11 +41,20 @@ class MainActivity : ComponentActivity() {
         }
 
         // random events emulating pushes
-//        lifecycleScope.launch {
-//            delay(Random.nextLong(5000, 15000))
-//            RefreshService.refresh("https://www.google.com")
-//        }
+        lifecycleScope.launch {
+            while (true) {
+                delay(Random.nextLong(7000, 15000))
+                currentBridge?.sendToWeb(
+                    "onPushNotification",
+                    mapOf(
+                        "url" to "https://www.google.com",
+                        "message" to "Lorem Ipsum"
+                    )
+                )
+            }
+        }
 
+        // listen to when web wants to refresh native
         lifecycleScope.launch {
             RefreshService.onRefresh.collect {
                 Timber.v("refreshing $it")
