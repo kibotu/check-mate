@@ -2,7 +2,7 @@ package com.check24.bridgesample.bridge.commands
 
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
-import com.check24.bridgesample.bridge.commands.utils.currentAppCompatActivity
+import com.check24.bridgesample.misc.currentAppCompatActivity
 import com.github.florent37.application.provider.ActivityProvider
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers

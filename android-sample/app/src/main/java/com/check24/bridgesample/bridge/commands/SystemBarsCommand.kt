@@ -2,10 +2,8 @@ package com.check24.bridgesample.bridge.commands
 
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
-import com.check24.bridgesample.bridge.commands.utils.isLightNavigationBar
-import com.check24.bridgesample.bridge.commands.utils.isLightStatusBar
-import com.check24.bridgesample.bridge.commands.utils.showSystemNavigationBar
-import com.check24.bridgesample.bridge.commands.utils.showSystemStatusBar
+import com.check24.bridgesample.misc.showSystemNavigationBar
+import com.check24.bridgesample.misc.showSystemStatusBar
 import com.github.florent37.application.provider.ActivityProvider
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers

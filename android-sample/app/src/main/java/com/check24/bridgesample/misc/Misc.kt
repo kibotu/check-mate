@@ -1,4 +1,4 @@
-package com.check24.bridgesample.bridge.commands.utils
+package com.check24.bridgesample.misc
 
 import androidx.appcompat.app.AppCompatActivity
 import com.github.florent37.application.provider.ActivityProvider

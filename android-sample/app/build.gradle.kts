@@ -40,6 +40,13 @@ android {
             allWarningsAsErrors.set(false)
             verbose.set(true)
             jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
+                listOf(
+                    "-Xjvm-default=all-compatibility",
+                    "-opt-in=kotlin.RequiresOptIn",
+                    "-Xannotation-default-target=param-property"
+                )
+            )
         }
     }
 
