@@ -1,6 +1,7 @@
 package com.check24.bridgesample.bridge.commands.topnavigation
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -8,11 +9,11 @@ import kotlinx.coroutines.flow.StateFlow
  * updated by bridge commands and observed by UI (e.g., MainActivity).
  */
 object TopNavigationService {
-    private val _config: MutableStateFlow<TopNavigationConfig> =
-        MutableStateFlow(TopNavigationConfig())
-    val config: StateFlow<TopNavigationConfig> = _config
+
+    val config: SharedFlow<TopNavigationConfig>
+        field = MutableStateFlow<TopNavigationConfig>(TopNavigationConfig())
 
     fun applyConfig(newConfig: TopNavigationConfig) {
-        _config.value = newConfig
+        config.value = newConfig
     }
 }

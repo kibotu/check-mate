@@ -1,7 +1,8 @@
-package de.check24.profis.partner.pluginapi.features.webview.bridge.commands
+package com.check24.bridgesample.bridge.commands.refresh
 
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
+import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -42,11 +43,7 @@ class RefreshCommand : BridgeCommand {
 
             Timber.i("[RefreshCommand] Triggering refresh with command=$command")
 
-//            @OptIn(CoreInternalApi::class)
-//            CorePluginServices
-//                .services
-//                .refreshService
-//                .refresh(command.takeIf { it.isNotEmpty() })
+            RefreshService.refresh(command)
 
             BridgeResponseUtils.createSuccessResponse()
         } catch (e: Exception) {
@@ -58,5 +55,3 @@ class RefreshCommand : BridgeCommand {
         }
     }
 }
-
-

@@ -17,7 +17,7 @@ import com.check24.bridgesample.bridge.commands.ShowToastCommand
 import com.check24.bridgesample.bridge.commands.systembars.SystemBarsCommand
 import com.check24.bridgesample.bridge.commands.topnavigation.TopNavigationCommand
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
-import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.RefreshCommand
+import com.check24.bridgesample.bridge.commands.refresh.RefreshCommand
 import timber.log.Timber
 
 /**

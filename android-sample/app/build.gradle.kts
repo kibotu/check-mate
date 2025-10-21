@@ -36,6 +36,9 @@ android {
     }
 
     kotlin {
+        sourceSets.all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
         compilerOptions {
             allWarningsAsErrors.set(false)
             verbose.set(true)

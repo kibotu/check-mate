@@ -42,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import com.check24.bridgesample.WebViewScreen
 import com.check24.bridgesample.bridge.JavaScriptBridge
 import com.check24.bridgesample.bridge.commands.bottomnavigation.BottomNavigationService
+import com.check24.bridgesample.bridge.commands.topnavigation.TopNavigationConfig
 import com.check24.bridgesample.bridge.commands.topnavigation.TopNavigationService
 
 @ExperimentalMaterial3Api
@@ -52,8 +53,8 @@ fun Screen(
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val navController = rememberNavController()
-    val topNavConfig by TopNavigationService.config.collectAsState()
-    val isBottomBarVisible by BottomNavigationService.isVisible.collectAsState()
+    val topNavConfig by TopNavigationService.config.collectAsState(TopNavigationConfig())
+    val isBottomBarVisible by BottomNavigationService.isVisible.collectAsState(true)
 
     LaunchedEffect(selectedTabIndex) {
         when (selectedTabIndex) {
