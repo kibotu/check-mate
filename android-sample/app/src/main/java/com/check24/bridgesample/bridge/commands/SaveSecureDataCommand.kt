@@ -1,7 +1,11 @@
 package com.check24.bridgesample.bridge.commands
 
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
+import com.github.florent37.application.provider.ActivityProvider
+import com.github.florent37.application.provider.application
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -43,7 +47,7 @@ class SaveSecureDataCommand : BridgeCommand {
 
     override suspend fun handle(content: Any?): JSONObject = withContext(Dispatchers.IO) {
         val key = BridgeParsingUtils.parseString(content, "key")
-        BridgeParsingUtils.parseString(content, "value")
+        val value = BridgeParsingUtils.parseString(content, "value")
 
         if (key.isEmpty()) {
             return@withContext BridgeResponseUtils.createErrorResponse(
@@ -53,8 +57,24 @@ class SaveSecureDataCommand : BridgeCommand {
         }
 
         try {
-            // You can integrate with your secure storage system here
-            Timber.i("[handle] key=$key")
+            val context = ActivityProvider.currentActivity ?: application
+
+            // Create or retrieve a strong MasterKey backed by Android Keystore
+            val masterKey = MasterKey.Builder(requireNotNull(context))
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+
+            // Encrypted SharedPreferences instance
+            val prefs = EncryptedSharedPreferences.create(
+                requireNotNull(context),
+                "secure_storage",
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+
+            prefs.edit().putString(key, value).apply()
+            Timber.i("[handle] saved key=$key, valueLength=${value.length}")
             BridgeResponseUtils.createSuccessResponse()
         } catch (e: Exception) {
             Timber.e(e)

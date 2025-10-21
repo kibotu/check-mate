@@ -1,7 +1,11 @@
 package com.check24.bridgesample.bridge.commands
 
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.check24.bridgesample.bridge.commands.utils.BridgeParsingUtils
 import com.check24.bridgesample.bridge.commands.utils.BridgeResponseUtils
+import com.github.florent37.application.provider.ActivityProvider
+import com.github.florent37.application.provider.application
 import de.check24.profis.partner.pluginapi.features.webview.bridge.commands.BridgeCommand
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -45,11 +49,25 @@ class LoadSecureDataCommand : BridgeCommand {
         }
 
         try {
-            // You can integrate with your secure storage system here
-            Timber.i("[handle] key=$key")
+            val context = ActivityProvider.currentActivity ?: application
+
+            val masterKey = MasterKey.Builder(requireNotNull(context))
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+
+            val prefs = EncryptedSharedPreferences.create(
+                requireNotNull(context),
+                "secure_storage",
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+
+            val value = prefs.getString(key, null)
+            Timber.i("[handle] loaded key=$key, valueLength=${value?.length ?: 0}")
             JSONObject().apply {
                 put("key", key)
-                put("value", null) // Return null if not found
+                put("value", value)
             }
         } catch (e: Exception) {
             Timber.e(e)

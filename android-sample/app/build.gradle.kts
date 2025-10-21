@@ -71,6 +71,7 @@ dependencies {
     implementation("androidx.webkit:webkit:1.14.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation("androidx.security:security-crypto:1.1.0")
 
     // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2025.10.00"))
