@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Public
@@ -40,8 +40,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.check24.bridgesample.WebViewScreen
-import com.check24.bridgesample.bridge.commands.bottomnavigation.BottomNavigationService
 import com.check24.bridgesample.bridge.JavaScriptBridge
+import com.check24.bridgesample.bridge.commands.bottomnavigation.BottomNavigationService
 import com.check24.bridgesample.bridge.commands.topnavigation.TopNavigationService
 
 @ExperimentalMaterial3Api
@@ -92,7 +92,7 @@ fun Screen(
                                     if (topNavConfig.showUpArrow) {
                                         IconButton(onClick = { onBackPressed() }) {
                                             Icon(
-                                                imageVector = Icons.Filled.ArrowBack,
+                                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                                 contentDescription = "Back"
                                             )
                                         }
