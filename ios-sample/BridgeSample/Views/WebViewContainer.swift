@@ -110,4 +110,12 @@ class WebViewController: UIViewController, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         Orchard.e("[WebView] Provisional navigation failed: \(error.localizedDescription)")
     }
+    
+    func onWindowFocusChanged(hasFocus: Bool) {
+        if hasFocus {
+            bridge?.sendToWeb(action: "lifecycle", content: ["event": "focused"])
+        } else {
+            bridge?.sendToWeb(action: "lifecycle", content: ["event": "defocused"])
+        }
+    }
 }
