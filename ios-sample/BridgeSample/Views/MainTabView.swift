@@ -42,7 +42,9 @@ struct MainTabView: View {
                             currentBridge = bridge
                             Orchard.v("[MainTabView] Bridge ready for Tab 1")
                             startPushNotificationSimulation(bridge: bridge)
-                        }
+                        },
+                        shouldRespectTopSafeArea: !topNavService.config.isVisible,
+                        shouldRespectBottomSafeArea: !bottomNavService.config.isVisible
                     )
                     .transition(.opacity)
                 }
@@ -54,7 +56,9 @@ struct MainTabView: View {
                         onBridgeReady: { bridge in
                             currentBridge = bridge
                             Orchard.v("[MainTabView] Bridge ready for Tab 2")
-                        }
+                        },
+                        shouldRespectTopSafeArea: !topNavService.config.isVisible,
+                        shouldRespectBottomSafeArea: !bottomNavService.config.isVisible
                     )
                     .transition(.opacity)
                 }
