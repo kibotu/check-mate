@@ -10,7 +10,6 @@ struct WebViewScreen: View {
             url: url,
             onBridgeReady: onBridgeReady
         )
-        .edgesIgnoringSafeArea(.all)
     }
 }
 

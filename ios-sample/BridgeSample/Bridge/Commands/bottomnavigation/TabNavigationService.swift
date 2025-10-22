@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Orchard
 
 /// Service to manage tab navigation across the app
 ///
@@ -20,7 +21,7 @@ class TabNavigationService: ObservableObject {
             withAnimation {
                 self.selectedTab = index
             }
-            print("[TabNavigationService] Switched to tab \(index)")
+            Orchard.v("[TabNavigationService] Switched to tab \(index)")
         }
     }
 }

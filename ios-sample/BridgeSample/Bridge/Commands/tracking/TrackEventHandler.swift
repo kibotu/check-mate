@@ -1,4 +1,5 @@
 import Foundation
+import Orchard
 
 /// Handler for tracking analytics events (fire-and-forget)
 ///
@@ -33,9 +34,9 @@ class TrackEventHandler: BridgeCommand {
         
 //        // Track event using C24Tracker (forwards to Firebase Analytics)
         let trackingEvent = BridgeTrackingEvent(name: event, parameters: params)
-        print(trackingEvent)
+        Orchard.v("\(trackingEvent)")
         
-        print("[Bridge] Track event: \(event) with params: \(params)")
+        Orchard.v("[Bridge] Track event: \(event) with params: \(params)")
         
         // Fire-and-forget: immediately return success
         completion(.success(nil))

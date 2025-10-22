@@ -1,4 +1,5 @@
 import SwiftUI
+import Orchard
 
 /// Main tab view with bottom navigation
 struct MainTabView: View {
@@ -8,11 +9,27 @@ struct MainTabView: View {
     @ObservedObject private var tabNavService = TabNavigationService.shared
     @ObservedObject private var systemUIState = SystemUIState.shared
     
+    /// Compute which edges should ignore safe area based on navigation visibility
+    private var safeAreaEdgesToIgnore: Edge.Set {
+        let topInvisible = !topNavService.config.isVisible
+        let bottomInvisible = !bottomNavService.config.isVisible
+        
+        if topInvisible && bottomInvisible {
+            return .all
+        } else if topInvisible {
+            return .top
+        } else if bottomInvisible {
+            return .bottom
+        } else {
+            return []
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             // Top Navigation
             TopNavigationView(onBackPressed: {
-                print("[MainTabView] Back button pressed")
+                Orchard.v("[MainTabView] Back button pressed")
             })
             
             // Content
@@ -23,7 +40,7 @@ struct MainTabView: View {
                         url: getLocalFileURL(filename: "index.html"),
                         onBridgeReady: { bridge in
                             currentBridge = bridge
-                            print("[MainTabView] Bridge ready for Tab 1")
+                            Orchard.v("[MainTabView] Bridge ready for Tab 1")
                             startPushNotificationSimulation(bridge: bridge)
                         }
                     )
@@ -36,7 +53,7 @@ struct MainTabView: View {
                         url: URL(string: "https://portfolio.kibotu.net/")!,
                         onBridgeReady: { bridge in
                             currentBridge = bridge
-                            print("[MainTabView] Bridge ready for Tab 2")
+                            Orchard.v("[MainTabView] Bridge ready for Tab 2")
                         }
                     )
                     .transition(.opacity)
@@ -74,7 +91,7 @@ struct MainTabView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .edgesIgnoringSafeArea(.bottom)
+        .edgesIgnoringSafeArea(safeAreaEdgesToIgnore)
         .statusBarHidden(systemUIState.isStatusBarHidden)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             currentBridge?.notifyLifecycleEvent("focused")

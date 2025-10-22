@@ -1,4 +1,5 @@
 import Foundation
+import Orchard
 
 /// Handler for lifecycle events
 ///
@@ -32,7 +33,7 @@ class LifecycleEventsHandler: BridgeCommand {
         
         bridge?.lifecycleEventsEnabled = enable
         
-        print("[Bridge] Lifecycle events \(enable ? "enabled" : "disabled")")
+        Orchard.v("[Bridge] Lifecycle events \(enable ? "enabled" : "disabled")")
         completion(.success(nil))
     }
 }

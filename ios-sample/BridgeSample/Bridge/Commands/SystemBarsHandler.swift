@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import SwiftUI
+import Orchard
 
 /// Shared state manager for system UI visibility
 ///
@@ -44,7 +45,7 @@ class SystemBarsHandler: BridgeCommand {
             return
         }
         
-        print("[Bridge] System bars command: showStatusBar=\(showStatusBar)")
+        Orchard.v("[Bridge] System bars command: showStatusBar=\(showStatusBar)")
         
         DispatchQueue.main.async {
             // Invert the value: showStatusBar=true means hide=false

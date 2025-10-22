@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import WebKit
+import Orchard
 
 /// Handles multiple navigation patterns: back navigation, internal/external URLs.
 ///
@@ -40,7 +41,7 @@ class NavigationHandler: BridgeCommand {
         let isExternal = content?["external"] as? Bool ?? false
         let goBack = content?["goBack"] as? Bool ?? false
         
-        print("[NavigationHandler] url=\(urlString) external=\(isExternal) goBack=\(goBack)")
+        Orchard.v("[NavigationHandler] url=\(urlString) external=\(isExternal) goBack=\(goBack)")
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
@@ -53,7 +54,7 @@ class NavigationHandler: BridgeCommand {
                 // Strategy 1: Try WebView back navigation if there's history
                 if let webView = self.webView, webView.canGoBack {
                     webView.goBack()
-                    print("[NavigationHandler] Navigated back in WebView history")
+                    Orchard.v("[NavigationHandler] Navigated back in WebView history")
                     completion(.success(nil))
                     return
                 }
@@ -62,7 +63,7 @@ class NavigationHandler: BridgeCommand {
                 if let navigationController = self.viewController?.navigationController,
                    navigationController.viewControllers.count > 1 {
                     navigationController.popViewController(animated: true)
-                    print("[NavigationHandler] Popped navigation controller")
+                    Orchard.v("[NavigationHandler] Popped navigation controller")
                     completion(.success(nil))
                     return
                 }
@@ -71,7 +72,7 @@ class NavigationHandler: BridgeCommand {
                 if let viewController = self.viewController,
                    viewController.presentingViewController != nil {
                     viewController.dismiss(animated: true) {
-                        print("[NavigationHandler] Dismissed modal view controller")
+                        Orchard.v("[NavigationHandler] Dismissed modal view controller")
                         completion(.success(nil))
                     }
                     return
@@ -79,7 +80,7 @@ class NavigationHandler: BridgeCommand {
                 
                 // Strategy 4: Last resort - exit the app (iOS doesn't encourage this, but it's what the user requested)
                 // Note: This will cause the app to exit, which is against Apple's HIG but matches Android behavior
-                print("[NavigationHandler] No back navigation available, exiting app")
+                Orchard.w("[NavigationHandler] No back navigation available, exiting app")
                 exit(0)
             }
             
@@ -97,7 +98,7 @@ class NavigationHandler: BridgeCommand {
                 } else {
                     // Internal navigation - switch to tab 2 (Web tab)
                     // This demonstrates internal app navigation triggered by the web content
-                    print("[NavigationHandler] Internal navigation to: \(urlString)")
+                    Orchard.v("[NavigationHandler] Internal navigation to: \(urlString)")
                     TabNavigationService.shared.switchToTab(1)
                     completion(.success(nil))
                 }

@@ -39,6 +39,7 @@
 		C35C0E702EA780C000D4D420 /* TrackScreenHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E542EA780C000D4D420 /* TrackScreenHandler.swift */; };
 		C35C0E712EA780C000D4D420 /* NavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E482EA780C000D4D420 /* NavigationHandler.swift */; };
 		C35C0E722EA780C000D4D420 /* SaveSecureDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35C0E4E2EA780C000D4D420 /* SaveSecureDataHandler.swift */; };
+		C35C0E7C2EA7AD3800D4D420 /* Orchard in Frameworks */ = {isa = PBXBuildFile; productRef = C35C0E7B2EA7AD3800D4D420 /* Orchard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -83,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C35C0E7C2EA7AD3800D4D420 /* Orchard in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +251,7 @@
 			);
 			mainGroup = A1000016000000000000001;
 			packageReferences = (
+				C35C0E7A2EA7AD3800D4D420 /* XCRemoteSwiftPackageReference "Orchard" */,
 			);
 			productRefGroup = A1000018000000000000001 /* Products */;
 			projectDirPath = "";
@@ -504,6 +507,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C35C0E7A2EA7AD3800D4D420 /* XCRemoteSwiftPackageReference "Orchard" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kibotu/Orchard";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C35C0E7B2EA7AD3800D4D420 /* Orchard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C35C0E7A2EA7AD3800D4D420 /* XCRemoteSwiftPackageReference "Orchard" */;
+			productName = Orchard;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A1000025000000000000001 /* Project object */;
 }

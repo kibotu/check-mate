@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import Orchard
 
 /// SwiftUI wrapper for WKWebView with JavaScript bridge integration
 struct WebViewContainer: UIViewControllerRepresentable {
@@ -47,7 +48,7 @@ class WebViewController: UIViewController, WKNavigationDelegate {
         bridge = jsBridge
         onBridgeReady?(jsBridge)
         
-        print("[WebViewController] Bridge initialized")
+        Orchard.v("[WebViewController] Bridge initialized")
         
         // Load URL
         if let url = url {
@@ -59,14 +60,14 @@ class WebViewController: UIViewController, WKNavigationDelegate {
     // MARK: - WKNavigationDelegate
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("[WebView] Page loaded: \(webView.url?.absoluteString ?? "unknown")")
+        Orchard.v("[WebView] Page loaded: \(webView.url?.absoluteString ?? "unknown")")
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        print("[WebView] Navigation failed: \(error.localizedDescription)")
+        Orchard.e("[WebView] Navigation failed: \(error.localizedDescription)")
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        print("[WebView] Provisional navigation failed: \(error.localizedDescription)")
+        Orchard.e("[WebView] Provisional navigation failed: \(error.localizedDescription)")
     }
 }

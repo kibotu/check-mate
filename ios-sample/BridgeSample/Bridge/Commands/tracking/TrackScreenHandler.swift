@@ -1,4 +1,5 @@
 import Foundation
+import Orchard
 
 /// Handler for tracking screen views (fire-and-forget)
 ///
@@ -43,9 +44,9 @@ class TrackScreenHandler: BridgeCommand {
             name: "screen_view",
             parameters: parameters
         )
-        print(trackingEvent)
+        Orchard.v("\(trackingEvent)")
         
-        print("[Bridge] Track screen: \(screenName), class: \(String(describing: screenClass))")
+        Orchard.v("[Bridge] Track screen: \(screenName), class: \(String(describing: screenClass))")
         
         // Fire-and-forget: immediately return success
         completion(.success(nil))
