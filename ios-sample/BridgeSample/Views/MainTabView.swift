@@ -96,7 +96,7 @@ struct MainTabView: View {
             }
         }
         .edgesIgnoringSafeArea(safeAreaEdgesToIgnore)
-        .statusBarHidden(systemUIState.isStatusBarHidden)
+        .statusBar(hidden: systemUIState.isStatusBarHidden)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             currentBridge?.notifyLifecycleEvent("focused")
         }

@@ -49,7 +49,9 @@ class SystemBarsHandler: BridgeCommand {
         
         DispatchQueue.main.async {
             // Invert the value: showStatusBar=true means hide=false
-            SystemUIState.shared.isStatusBarHidden = !showStatusBar
+            withAnimation(.easeInOut(duration: 0.2)) {
+                 SystemUIState.shared.isStatusBarHidden = !showStatusBar
+             }
             completion(.success(nil))
         }
     }
